@@ -23436,7 +23436,6 @@ var MainConfig = {
     Timepicker: "atoms/timepicker/timepicker.vue"
   },
   molecules: {
-    Skeleton: "molecules/skeleton/skeleton.vue",
     AccountMenu: "molecules/account-menu/account-menu.vue",
     AccountNew: "molecules/account-new/account-new.vue",
     AccountSuccess: {
