@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "vuefront": {
+      "signature": "eac2d92026cea68d539664ea41f69908",
+      "file": true,
+      "replaced": "^0.3.67"
+    }
+  }
+}
