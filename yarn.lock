@@ -2768,6 +2768,11 @@ locate-path@^3.0.0:
     p-locate "^3.0.0"
     path-exists "^3.0.0"
 
+lodash-es@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash.camelcase@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
@@ -4375,10 +4380,10 @@ vue@^2.6.12:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
   integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==
 
-vuefront@^0.3.69:
-  version "0.3.69"
-  resolved "https://registry.yarnpkg.com/vuefront/-/vuefront-0.3.69.tgz#2a547c88498de6a9a52eff965cb326336b5a9cef"
-  integrity sha512-PhA4yQHOopfyJLzKZaRff27rOdot3qR/trmEjE/S57roeW/G5zSA9twDcGzHLj++Zcq5DnJoKaBwbo3fwxJiWg==
+vuefront@0.3.70:
+  version "0.3.70"
+  resolved "https://registry.yarnpkg.com/vuefront/-/vuefront-0.3.70.tgz#abf75ee417ec6cfb6640570a1f60cadb2b626ba1"
+  integrity sha512-1fSXYKPJtUWEXYK0lIy8XSqsz/JuUiD9MEnQG0ctzaL1wTC1dJIubWulGscWKinn2SDSsOTMhCrwE73SzHldhg==
   dependencies:
     "@babel/standalone" "^7.14.7"
     "@jamescoyle/vue-icon" "^0.1.0"
@@ -4393,6 +4398,7 @@ vuefront@^0.3.69:
     graphql "^15.5.1"
     graphql-tag "^2.12.5"
     lodash "^4.17.21"
+    lodash-es "^4.17.21"
     mini-svg-data-uri "^1.3.3"
     omit-deep-lodash "^1.1.5"
     tailwindcss "2.2.4"

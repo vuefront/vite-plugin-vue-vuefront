@@ -1,17 +1,20 @@
-import {compileTemplate} from '@vue/compiler-sfc'
+const { compile } = require("vue-template-compiler");
 const { getComponents } = require("./match");
 
 export default (template: string, filename, config: VueFrontConfig) => {
-  const result = compileTemplate({
-    source: template,
-    filename,
-    id: 'vuefront',
-     compilerOptions: {
-      
-    }
-  })
+  let tags = new Set();
+
+  compile(template, {
+    modules: [
+      {
+        postTransformNode: node => {
+          tags.add(node.tag);
+        },
+      },
+    ],
+  });
 
   return {
-    components: getComponents(config, [...result.ast.components]),
+    components: getComponents(config, [...tags]),
   };
 }

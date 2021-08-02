@@ -7,6 +7,6 @@
         "import"
     ],
     "extends": [
-        "eslint:recommended",
+        "eslint:recommended"
     ]
 }

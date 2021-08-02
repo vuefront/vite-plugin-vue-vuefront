@@ -11,7 +11,6 @@ import extract from './vite/extract'
 import transform from './vite/transform'
 import { config } from "dotenv";
 import { parseVueRequest } from './utils'
-export * from './vuefront-resolver'
 config()
 const fileRegex = /\.(vue)$/
 const externalScriptTemplate = new Map();
@@ -29,10 +28,18 @@ const extractAndTransform = (code, template = "", descriptor, config: VueFrontCo
 function pluginVueFront(
   options: VitePluginVueVueFrontOptions = {}
 ): Plugin {
-  const vuefrontCreateAppId = '@vuefront-create-app'
-  const vuefrontResolverId = '@vuefront-resolver'
+  
   const vuefrontRoutesId = '@vuefront-routes'
   const vuefrontPluginId = '@vuefront-plugin'
+  const vuefrontPlugins = [
+    '@vuefront-create-app',
+    '@vuefront-client',
+    '@vuefront-utils',
+    '@vuefront-lazy-components',
+    '@vuefront-seo-resolver',
+    '@vuefront-data-fetch',
+    '@vuefront-i18n'
+  ]
 
   const css = []
 
@@ -92,12 +99,20 @@ function pluginVueFront(
     async transform(src, id) {
       if (/vue&type=graphql/.test(id)) {
         src = src.replace('export default doc', '')
-        return `export default Comp => {
+        return `export default component => {
           ${src}
-          Comp.query = doc
+          var options = typeof component.exports === 'function'
+          ? component.exports.extendOptions
+          : component.options
+          if (typeof component.exports === 'function') {
+            options.query = doc
+          }
+          
+          options.query = doc
         }`
       }
       const descriptor = parseVueRequest(id)
+
       if (externalScriptTemplate.has(id)) {
         return extractAndTransform(src, externalScriptTemplate.get(id), descriptor, themeOptions);
       } else if (/.*\.vue/.test(id)) {
@@ -116,22 +131,19 @@ function pluginVueFront(
       return src
     },
     resolveId(id) {
+      if (_.includes(vuefrontPlugins,id)) {
+        return id
+      }
       if (id === vuefrontRoutesId) {
         return vuefrontRoutesId
-      }
-      if (id === vuefrontResolverId) {
-        return vuefrontResolverId
-      }
-      if (id === vuefrontCreateAppId) {
-        return vuefrontCreateAppId
       }
       if (id === vuefrontPluginId) {
         return vuefrontPluginId
       }
     },
     load(id) {
-      if (id === vuefrontCreateAppId) {
-        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/create-app.js'));
+      if (_.includes(vuefrontPlugins,id)) {
+        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/'+id+'.js'));
         let compiled = _.template(routesContent.toString())
 
         return compiled({
@@ -141,12 +153,12 @@ function pluginVueFront(
         })
       }
       if (id === vuefrontRoutesId) {
-        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/routes.js'));
+        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-routes.js'));
         let compiled = _.template(routesContent.toString())
         return compiled({ options: { routes } })
       }
       if (id === vuefrontPluginId) {
-        const pluginContent = fs.readFileSync(path.resolve(__dirname, '../templates/plugin.js'));
+        const pluginContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-plugin.js'));
         let compiled = _.template(pluginContent.toString())
 
         return compiled({

@@ -3,9 +3,17 @@
 // be included in the final webpack user bundle.
 
 export default (component, components) => {
-  component.components = component.components || {}
+  var options = typeof component.exports === 'function'
+    ? component.exports.extendOptions
+    : component.options
+
+  if (typeof component.exports === 'function') {
+    options.components = component.exports.options.components
+  }
+
+  options.components = options.components || {}
 
   for (var i in components) {
-    component.components[i] = component.components[i] || components[i]
+    options.components[i] = options.components[i] || components[i]
   }
 }
