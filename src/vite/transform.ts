@@ -97,46 +97,6 @@ const findImportTarget = ast => {
 };
 
 export default (code, components = [], config: VueFrontConfig) => {
-  // const s = new MagicString(code)
-  //
-  // const head: string[] = []
-  // for (const match of code.matchAll(/_c\(['"](.+?)["']([,)])/g)) {
-  //   const [full, matchedName, append] = match
-  //
-  //   if (match.index != null && matchedName && !matchedName.startsWith('_')) {
-  //     const start = match.index
-  //     const end = start + full.length
-  //     const name = pascalCase(matchedName)
-  //     console.log('name')
-  //     console.log(name)
-  //     const regex = /^Vf(.)(.*)$/gm
-  //
-  //     const m = regex.exec(name)
-  //
-  //    
-  //
-  //     head.push(getImport(name, m[1], config, m[2], renderImport))
-  //   }
-  // }
-  // s.prepend(`${head.join(';')};`)
-  // console.log(s.toString())
-  // return { code: s.toString() }
-  // s.prepend()
-  // const ast = j(code);
-  // const importTarget = findImportTarget(ast);
-  // const alreadyAdded = importTarget.specifiers
-  //   .filter(path => path.type === j.ImportSpecifier.name)
-  //   .map(path => path.local.name);
-  // console.log(alreadyAdded)
-  // const uniqImportSpecifiers = components
-  // .filter(name => !alreadyAdded.includes(name))
-  // .map(name => j.importSpecifier(j.identifier(name)));
-  // importTarget.specifiers = [
-  //   ...importTarget.specifiers,
-  //   ...uniqImportSpecifiers,
-  // ];
-  // console.log(ast.toSource())
-  // return ast.toSource();
   const imports = []
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm
