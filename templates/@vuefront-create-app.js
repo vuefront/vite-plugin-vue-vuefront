@@ -26,6 +26,7 @@ export const createVueFrontApp = async (App) => {
   const store = new Vuex.Store()
 
   context.$store = store
+  context.store = store
 
   const inject = (key, value) => {
     if (isUndefined(app[key])) {
@@ -66,8 +67,9 @@ export const createVueFrontApp = async (App) => {
 
   await VuefrontPlugin(context, inject)
   const i18n = await VuefrontI18n(context, inject)
-  
+  inject(i18n, inject)
   store.app = injectVars
+  store.app.i18n = i18n
   
   vuefrontApp = new Vue({
     i18n,
@@ -81,7 +83,7 @@ export const createVueFrontApp = async (App) => {
   } else if(document) {
     await store.dispatch('vuefront/nuxtClientInit', app)
   }
-  VuefrontClient(context)
+  await VuefrontClient(context)
   
   window.__VEUFRONT__ = context
   return vuefrontApp

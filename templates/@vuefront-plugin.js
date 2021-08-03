@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import isEmpty from 'lodash-es/isEmpty'
 import map from 'lodash-es/map'
 import ApolloClient from "apollo-boost";
@@ -115,6 +116,10 @@ export default async (ctx, inject) => {
         templates.<%= key %> = () => {
           return import('<%= options.themeOptions.templates[key].path %>').then(m => m.<%= options.themeOptions.templates[key].component %>)
         }<% } %><% } %><% } %>
+
+  Vue.component('ClientOnly', {
+    template: '<slot></slot>'
+  })
   
   inject('vuefront', {
     layouts: <%= JSON.stringify(options.themeOptions.layouts || {}) %>,

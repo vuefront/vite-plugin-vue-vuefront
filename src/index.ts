@@ -38,7 +38,8 @@ function pluginVueFront(
     '@vuefront-lazy-components',
     '@vuefront-seo-resolver',
     '@vuefront-data-fetch',
-    '@vuefront-i18n'
+    '@vuefront-i18n',
+    '@vuefront-fix-prepatch'
   ]
 
   const css = []
