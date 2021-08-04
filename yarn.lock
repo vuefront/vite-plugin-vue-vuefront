@@ -4380,7 +4380,7 @@ vue@^2.6.12:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
   integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==
 
-vuefront@0.3.70:
+vuefront@^0.3.70:
   version "0.3.70"
   resolved "https://registry.yarnpkg.com/vuefront/-/vuefront-0.3.70.tgz#abf75ee417ec6cfb6640570a1f60cadb2b626ba1"
   integrity sha512-1fSXYKPJtUWEXYK0lIy8XSqsz/JuUiD9MEnQG0ctzaL1wTC1dJIubWulGscWKinn2SDSsOTMhCrwE73SzHldhg==
