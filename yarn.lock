@@ -466,10 +466,10 @@
   dependencies:
     dotenv "*"
 
-"@types/estree@0.0.46":
-  version "0.0.46"
-  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.46.tgz#0fb6bfbbeabd7a30880504993369c4bf1deab1fe"
-  integrity sha512-laIjwTQaD+5DukBZaygQ79K1Z0jb1bPEMRrkXSLjtCcZm+abyp5YbrqpSLzD42FwWW6gK/aS4NYpJ804nG2brg==
+"@types/estree@0.0.50":
+  version "0.0.50"
+  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.50.tgz#1e0caa9364d3fccd2931c3ed96fdbeaa5d4cca83"
+  integrity sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==
 
 "@types/estree@^0.0.48":
   version "0.0.48"
@@ -3424,7 +3424,7 @@ postcss@7.x.x:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.1.10, postcss@^8.1.6, postcss@^8.2.1, postcss@^8.3.5:
+postcss@^8.1.10, postcss@^8.1.6, postcss@^8.2.1, postcss@^8.3.6:
   version "8.3.6"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.6.tgz#2730dd76a97969f37f53b9a6096197be311cc4ea"
   integrity sha512-wG1cc/JhRgdqB6WHEuyLTedf3KIRuD0hG6ldkFEZNCjRxiC+3i6kkWUUbiJQayP28iwG35cEmAbe98585BYV0A==
@@ -4326,13 +4326,13 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vite@^2.0.0-beta.67:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-2.4.3.tgz#fe4aa78e9dd7d36bcb12eccbd52313b26cfadf77"
-  integrity sha512-iT6NPeiUUZ2FkzC3eazytOEMRaM4J+xgRQcNcpRcbmfYjakCFP4WKPJpeEz1U5JEKHAtwv3ZBQketQUFhFU3ng==
+vite@^2.4.4:
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-2.4.4.tgz#8c402a07ad45f168f6eb5428bead38f3e4363e47"
+  integrity sha512-m1wK6pFJKmaYA6AeZIUXyiAgUAAJzVXhIMYCdZUpCaFMGps0v0IlNJtbmPvkUhVEyautalajmnW5X6NboUPsnw==
   dependencies:
     esbuild "^0.12.8"
-    postcss "^8.3.5"
+    postcss "^8.3.6"
     resolve "^1.20.0"
     rollup "^2.38.5"
   optionalDependencies:
@@ -4380,10 +4380,10 @@ vue@^2.6.12:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
   integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==
 
-vuefront@^0.3.70:
-  version "0.3.70"
-  resolved "https://registry.yarnpkg.com/vuefront/-/vuefront-0.3.70.tgz#abf75ee417ec6cfb6640570a1f60cadb2b626ba1"
-  integrity sha512-1fSXYKPJtUWEXYK0lIy8XSqsz/JuUiD9MEnQG0ctzaL1wTC1dJIubWulGscWKinn2SDSsOTMhCrwE73SzHldhg==
+vuefront@^0.3.71:
+  version "0.3.71"
+  resolved "https://registry.yarnpkg.com/vuefront/-/vuefront-0.3.71.tgz#78cb8b3eeaebc5a29520d1c8a9c5b12e5ae1fee1"
+  integrity sha512-rZWGMPLSWUGj2q6mtfOQkLImC5r1Qv5fRaqgwKTOhSg8ZYZU+uFdcEuCZpXAYaeZQqNjfNRVnNWUtN+FxRvd0Q==
   dependencies:
     "@babel/standalone" "^7.14.7"
     "@jamescoyle/vue-icon" "^0.1.0"
