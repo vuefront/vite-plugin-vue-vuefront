@@ -1,13 +1,14 @@
-const { compile } = require("vue-template-compiler");
+import { ASTElement, compile } from "vue-template-compiler";
 const { getComponents } = require("./match");
 
-export default (template: string, filename, config: VueFrontConfig) => {
-  let tags = new Set();
+export default (template: string, filename: string, config: VueFrontConfig) => {
+  let tags = new Set<string>();
 
   compile(template, {
     modules: [
+      //@ts-ignore
       {
-        postTransformNode: node => {
+        postTransformNode: (node: ASTElement): void => {
           tags.add(node.tag);
         },
       },

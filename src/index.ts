@@ -10,12 +10,12 @@ import {load} from './vite/load'
 import extract from './vite/extract'
 import transform from './vite/transform'
 import { config } from "dotenv";
-import { parseVueRequest } from './utils'
+import { parseVueRequest, VueQuery } from './utils'
+export * from './options'
 config()
-const fileRegex = /\.(vue)$/
 const externalScriptTemplate = new Map();
 
-const extractAndTransform = (code, template = "", descriptor, config: VueFrontConfig) => {
+const extractAndTransform = (code: string, template = "", descriptor: {filename: string; query: VueQuery }, config: VueFrontConfig) => {
   if (typeof template !== "string" || !template.trim()) {
     return code;
   }
@@ -42,7 +42,7 @@ function pluginVueFront(
     '@vuefront-fix-prepatch'
   ]
 
-  const css = []
+  const css: string[] = []
 
   const themeOptions = setupConfig(process.cwd())
 
@@ -56,9 +56,6 @@ function pluginVueFront(
   let { routes } = setupRoutes(themeOptions)
 
   const images = setupImages(themeOptions)
-
-
-  const theme = process.env.VUEFRONT_THEME || 'default'
 
   const defaultPort =
     process.env.API_PORT ||
@@ -80,7 +77,7 @@ function pluginVueFront(
 
   const prefix =
     process.env.API_PREFIX || options.prefix || options.targetUrl
-  let browserBaseURL = null
+  let browserBaseURL: string | null = null
   let baseURL = `http://${defaultHost}:${defaultPort}${prefix}`
 
   if (process.env.API_URL) {
@@ -92,7 +89,11 @@ function pluginVueFront(
   }
 
   if (!browserBaseURL) {
-    browserBaseURL = options.proxy ? prefix : baseURL
+    if (options.proxy && prefix) {
+      browserBaseURL = prefix
+    } else {
+      browserBaseURL = baseURL
+    }
   }
 
   return {

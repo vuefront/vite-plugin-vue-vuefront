@@ -2,18 +2,18 @@ import { parseComponent } from "vue-template-compiler";
 import * as fs from 'fs'
 import * as path from 'path'
 
-const readFile = path =>
+const readFile = (path: string): Promise<string>  =>
   new Promise((resolve, reject) => {
     fs.readFile(path, (err, data) => {
       if (err) {
         reject(err);
       } else {
-        resolve(data);
+        resolve(data.toString());
       }
     });
   });
 
-export const load = async id => {
+export const load = async (id: string) => {
   const filename = id.replace(/\?.*/, "");
   const content = (await readFile(filename)).toString();
 
@@ -28,7 +28,7 @@ export const load = async id => {
         await readFile(
           path.resolve(path.dirname(filename), component.template.src),
         )
-      ).toString("utf8");
+      ).toString();
     } else {
       template = component.template.content;
     }

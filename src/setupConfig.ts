@@ -1,6 +1,7 @@
 import * as _ from 'lodash'
 let rootPath = ''
-import vuefrontConfig from 'vuefront'
+//@ts-ignore
+import vuefrontDefaultConfig from 'vuefront'
 
 const mergeConfig = (objValue: VueFrontConfig, srcValue: VueFrontConfig, index: string): VueFrontConfig => {
   if(index !== 'locales') {
@@ -203,10 +204,10 @@ const cloneConfig = (config: VueFrontConfig): VueFrontConfig => {
 export default (rootDir: string): VueFrontConfig => {
   let themeOptions: VueFrontConfig = {}
 
-  themeOptions = cloneConfig(vuefrontConfig)
+  themeOptions = cloneConfig(vuefrontDefaultConfig)
   rootPath = rootDir
 
-  themeOptions = {...themeOptions,...convertPath(vuefrontConfig)}
+  themeOptions = {...themeOptions,...convertPath(vuefrontDefaultConfig)}
   delete require.cache[require.resolve(rootDir + '/vuefront.config')]
   const themeConfig = require(rootDir + '/vuefront.config')
   let config = cloneConfig(themeConfig)

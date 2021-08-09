@@ -1,8 +1,9 @@
 {
     "name": "vite-plugin-vue-vuefront",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "vite-plugin-vue-vuefront",
     "main": "dist/index.js",
+    "types": "types/index.d.ts",
     "files": [
         "dist/**/*",
         "templates/**/*",
@@ -11,10 +12,9 @@
     "scripts": {
         "dev": "tsc -p . -w --incremental",
         "build": "rimraf dist && run-s build-bundle build-types",
-        "build-bundle": "nodemon -e ts -x esbuild src/index.ts --bundle --platform=node --target=node12 --external:@vue/compiler-sfc --outfile=dist/index.js",
+        "build-bundle": "nodemon -e ts -x esbuild src/index.ts --bundle --platform=node --target=node12 --external:vue-template-compiler --outfile=dist/index.js",
         "build-types": "tsc -p . --emitDeclarationOnly --outDir temp && api-extractor run && rimraf temp",
         "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path . --lerna-package plugin-vue",
-        "release": "node ../../scripts/release.js",
         "yalc-watch": "nodemon -e vue,js,scss,json -x yalc push"
     },
     "keywords": [
@@ -27,7 +27,7 @@
     "license": "MIT",
     "devDependencies": {
         "@types/estree": "0.0.50",
-        "@types/node": "^16.4.11",
+        "@types/node": "^16.4.12",
         "@types/stylelint": "^13.13.1",
         "@typescript-eslint/eslint-plugin": "^4.29.0",
         "@typescript-eslint/parser": "^4.29.0",
@@ -35,6 +35,7 @@
         "eslint-import-resolver-typescript": "^2.4.0",
         "eslint-plugin-import": "^2.23.4",
         "nodemon": "^2.0.12",
+        "npm-run-all": "^4.1.5",
         "typescript": "^4.3.5",
         "vite": "^2.4.4"
     },

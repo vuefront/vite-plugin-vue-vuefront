@@ -40,20 +40,20 @@ export function parseVueRequest(id: string): {
  */
 
  const camelizeRE = /-(\w)/g
- export const camelize = str => {
+ export const camelize = (str: string) => {
    return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
  }
  
- export const capitalize = str => {
+ export const capitalize = (str: string) => {
    return str.charAt(0).toUpperCase() + str.slice(1)
  }
  
  const hyphenateRE = /\B([A-Z])/g
- export const hyphenate = str => {
+ export const hyphenate = (str: string) => {
    return str.replace(hyphenateRE, '-$1').toLowerCase()
  }
  
- export function requirePeer (name) {
+ export function requirePeer (name: string) {
    try {
      return require(name)
    } catch (e) {
