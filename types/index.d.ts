@@ -63,10 +63,10 @@ declare type VueFrontConfigComponents = {
   }
 
   declare type VueFrontImage = {
-    path: string
+    path: string 
     image?: string
-    width: string
-    height: string
+    width?: string
+    height?: string
   }
 
   declare type VueFrontImageList = {

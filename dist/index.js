@@ -24230,8 +24230,6 @@ var setupImages_default = (config2) => {
     const image = config2.image[key];
     result[key] = {
       image: "",
-      width: "",
-      height: "",
       path: ""
     };
     if (_3.isString(image)) {

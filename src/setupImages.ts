@@ -6,8 +6,6 @@ export default (config: VueFrontConfig) => {
     const image = config.image[key]
     result[key] = {
       image: '',
-      width: '',
-      height: '',
       path: ''
     }
     if(_.isString(image)) {
