@@ -1,3 +1,5 @@
+import { VueQuery } from "../utils"
+
 export function camelCase(str: string) {
   return str.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''))
 }
@@ -86,7 +88,7 @@ const getImport = (name: string, type: string, config: VueFrontConfig, tag: stri
   return comImport
 }
 
-export default (code: string, components = [], config: VueFrontConfig) => {
+export default (code: string, components = [], config: VueFrontConfig, descriptor: {filename: string; query: VueQuery }) => {
   const imports = []
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm
@@ -112,9 +114,16 @@ export default (code: string, components = [], config: VueFrontConfig) => {
       newContent += item[1];
       result.push(`${item[0]}`)
     }
-    newContent += `\n\nif (typeof component !== "undefined") {\n installComponents(component, {${result.join(',')}})\n}\n`
+    newContent += `\n\nif (typeof component !== "undefined") {
+      \n installComponents(component, {${result.join(',')}})\n
+    }\n
+    if (typeof __component__ !== "undefined") {
+      \n installComponents(__component__, {${result.join(',')}})\n
+    }\n
+    `
     // Insert our modification before the HMR code
     const hotReload = code.indexOf('/* hot reload */')
+
     if (hotReload > -1) {
       code = code.slice(0, hotReload) + newContent + '\n\n' + code.slice(hotReload)
     } else {

@@ -21,8 +21,9 @@ const extractAndTransform = (code: string, template = "", descriptor: {filename:
   }
 
   const { components } = extract(template, descriptor.filename, config);
-
-  return transform(code, components, config)
+  console.log(descriptor.filename)
+  console.log(components)
+  return transform(code, components, config, descriptor)
 };
 
 function pluginVueFront(
@@ -114,7 +115,6 @@ function pluginVueFront(
         }`
       }
       const descriptor = parseVueRequest(id)
-
       if (externalScriptTemplate.has(id)) {
         return extractAndTransform(src, externalScriptTemplate.get(id), descriptor, themeOptions);
       } else if (/.*\.vue/.test(id)) {

@@ -24366,7 +24366,7 @@ var getImport = (name, type, config2, tag, renderImport2) => {
   }
   return comImport;
 };
-var transform_default = (code, components = [], config2) => {
+var transform_default = (code, components = [], config2, descriptor) => {
   const imports = [];
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm;
@@ -24393,9 +24393,18 @@ var transform_default = (code, components = [], config2) => {
     newContent += `
 
 if (typeof component !== "undefined") {
+      
  installComponents(component, {${result.join(",")}})
-}
-`;
+
+    }
+
+    if (typeof __component__ !== "undefined") {
+      
+ installComponents(__component__, {${result.join(",")}})
+
+    }
+
+    `;
     const hotReload = code.indexOf("/* hot reload */");
     if (hotReload > -1) {
       code = code.slice(0, hotReload) + newContent + "\n\n" + code.slice(hotReload);
@@ -24416,7 +24425,9 @@ var extractAndTransform = (code, template2 = "", descriptor, config2) => {
     return code;
   }
   const { components } = extract_default(template2, descriptor.filename, config2);
-  return transform_default(code, components, config2);
+  console.log(descriptor.filename);
+  console.log(components);
+  return transform_default(code, components, config2, descriptor);
 };
 function pluginVueFront(options = {}) {
   const vuefrontRoutesId = "@vuefront-routes";
