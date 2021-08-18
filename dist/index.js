@@ -24425,8 +24425,6 @@ var extractAndTransform = (code, template2 = "", descriptor, config2) => {
     return code;
   }
   const { components } = extract_default(template2, descriptor.filename, config2);
-  console.log(descriptor.filename);
-  console.log(components);
   return transform_default(code, components, config2, descriptor);
 };
 function pluginVueFront(options = {}) {

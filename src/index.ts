@@ -21,8 +21,7 @@ const extractAndTransform = (code: string, template = "", descriptor: {filename:
   }
 
   const { components } = extract(template, descriptor.filename, config);
-  console.log(descriptor.filename)
-  console.log(components)
+
   return transform(code, components, config, descriptor)
 };
 
