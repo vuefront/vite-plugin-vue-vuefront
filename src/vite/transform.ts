@@ -92,7 +92,7 @@ export default (code: string, components = [], config: VueFrontConfig) => {
     const regex = /^Vf(.)(.*)$/gm
 
     const m = regex.exec(tag)
-  
+
     if (!m) {
       continue
     }

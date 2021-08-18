@@ -88,7 +88,7 @@ export default async (ctx, inject) => {
 
   <% for (var key in options.images) { %>
 
-  images.<%= key %> = {}<% if (typeof options.images[key].image !== 'undefined') { %>
+  images.<%= key %> = {}<% if (typeof options.images[key].image !== 'undefined' && options.images[key].image !== '') { %>
   images.<%= key %>.image = <%= options.images[key].image  %>;
   images.<%= key %>.image = images.<%= key %>.image.default
   <% } %><% if (typeof options.images[key].width !== 'undefined') { %>
