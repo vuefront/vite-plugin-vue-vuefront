@@ -23985,7 +23985,7 @@ var mergeConfig = (objValue, srcValue, index) => {
   }
 };
 var checkPath = (path3) => {
-  const newPath = _.replace(path3, /^(~)/, rootPath);
+  const newPath = _.replace(path3, /^(~)/, rootPath + "/src");
   try {
     require.resolve(newPath);
     return true;

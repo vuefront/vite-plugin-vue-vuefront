@@ -26,7 +26,7 @@ const mergeConfig = (objValue: VueFrontConfig, srcValue: VueFrontConfig, index: 
 }
 
 const checkPath = (path: string) => {
-  const newPath = _.replace(path, /^(~)/, rootPath)
+  const newPath = _.replace(path, /^(~)/, rootPath + '/src')
   try {
     require.resolve(newPath)
     return true
