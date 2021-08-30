@@ -10,31 +10,39 @@ import {load} from './vite/load'
 import extract from './vite/extract'
 import transform from './vite/transform'
 import { config } from "dotenv";
-import { parseVueRequest } from './utils'
-export * from './vuefront-resolver'
+import { parseVueRequest, VueQuery } from './utils'
+export * from './options'
 config()
-const fileRegex = /\.(vue)$/
 const externalScriptTemplate = new Map();
 
-const extractAndTransform = (code, template = "", descriptor, config: VueFrontConfig) => {
+const extractAndTransform = (code: string, template = "", descriptor: {filename: string; query: VueQuery }, config: VueFrontConfig) => {
   if (typeof template !== "string" || !template.trim()) {
     return code;
   }
 
   const { components } = extract(template, descriptor.filename, config);
 
-  return transform(code, components, config)
+  return transform(code, components, config, descriptor)
 };
 
 function pluginVueFront(
   options: VitePluginVueVueFrontOptions = {}
 ): Plugin {
-  const vuefrontCreateAppId = '@vuefront-create-app'
-  const vuefrontResolverId = '@vuefront-resolver'
+  
   const vuefrontRoutesId = '@vuefront-routes'
   const vuefrontPluginId = '@vuefront-plugin'
+  const vuefrontCreateApp = '@vuefront-create-app'
+  const vuefrontPlugins = [
+    '@vuefront-client',
+    '@vuefront-utils',
+    '@vuefront-lazy-components',
+    '@vuefront-seo-resolver',
+    '@vuefront-data-fetch',
+    '@vuefront-i18n',
+    '@vuefront-fix-prepatch'
+  ]
 
-  const css = []
+  const css: string[] = []
 
   const themeOptions = setupConfig(process.cwd())
 
@@ -48,9 +56,6 @@ function pluginVueFront(
   let { routes } = setupRoutes(themeOptions)
 
   const images = setupImages(themeOptions)
-
-
-  const theme = process.env.VUEFRONT_THEME || 'default'
 
   const defaultPort =
     process.env.API_PORT ||
@@ -72,7 +77,7 @@ function pluginVueFront(
 
   const prefix =
     process.env.API_PREFIX || options.prefix || options.targetUrl
-  let browserBaseURL = null
+  let browserBaseURL: string | null = null
   let baseURL = `http://${defaultHost}:${defaultPort}${prefix}`
 
   if (process.env.API_URL) {
@@ -83,8 +88,14 @@ function pluginVueFront(
     browserBaseURL = process.env.API_URL_BROWSER
   }
 
+  let app = null
+
   if (!browserBaseURL) {
-    browserBaseURL = options.proxy ? prefix : baseURL
+    if (options.proxy && prefix) {
+      browserBaseURL = prefix
+    } else {
+      browserBaseURL = baseURL
+    }
   }
 
   return {
@@ -116,22 +127,22 @@ function pluginVueFront(
       return src
     },
     resolveId(id) {
+      if (_.includes(vuefrontPlugins,id)) {
+        return id
+      }
+      if (id === vuefrontCreateApp) {
+        return vuefrontCreateApp
+      }
       if (id === vuefrontRoutesId) {
         return vuefrontRoutesId
-      }
-      if (id === vuefrontResolverId) {
-        return vuefrontResolverId
-      }
-      if (id === vuefrontCreateAppId) {
-        return vuefrontCreateAppId
       }
       if (id === vuefrontPluginId) {
         return vuefrontPluginId
       }
     },
     load(id) {
-      if (id === vuefrontCreateAppId) {
-        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/create-app.js'));
+      if (_.includes(vuefrontPlugins,id)) {
+        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/'+id+'.js'));
         let compiled = _.template(routesContent.toString())
 
         return compiled({
@@ -140,13 +151,18 @@ function pluginVueFront(
           }
         })
       }
+      if (id === vuefrontCreateApp) {
+        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-create-app.js'));
+        let compiled = _.template(routesContent.toString())
+        return compiled({ options: { themeOptions } })
+      }
       if (id === vuefrontRoutesId) {
-        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/routes.js'));
+        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-routes.js'));
         let compiled = _.template(routesContent.toString())
         return compiled({ options: { routes } })
       }
       if (id === vuefrontPluginId) {
-        const pluginContent = fs.readFileSync(path.resolve(__dirname, '../templates/plugin.js'));
+        const pluginContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-plugin.js'));
         let compiled = _.template(pluginContent.toString())
 
         return compiled({

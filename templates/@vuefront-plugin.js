@@ -1,13 +1,30 @@
-import isEmpty from 'lodash/isEmpty'
+import isEmpty from 'lodash-es/isEmpty'
+import map from 'lodash-es/map'
 import ApolloClient from "apollo-boost";
+import VueLazyLoad from 'vue3-lazyload'
 import 'isomorphic-fetch'
+<% for (var key in options.themeOptions.extensions) { %>
+  <% if (options.themeOptions.extensions[key].type === 'full') { %>
+     import <%= key %> from '<%= options.themeOptions.extensions[key].path %>'
+  <% } else { %>
+    import {<%= options.themeOptions.extensions[key].component %> as <%= key %>} from '<%= options.themeOptions.extensions[key].path %>'
+<% } %><% } %>
+<% for (var key in options.themeOptions.templates) { %>
+  <% if (key.startsWith('Layout')) {%>
+    <% if (options.themeOptions.templates[key].type === 'full') { %>
+      import <%= key %> from '<%= options.themeOptions.templates[key].path %>'
+    <% } else { %>
+      import {<%= options.themeOptions.templates[key].component %> as <%= key %>} from '<%= options.themeOptions.templates[key].path %>'
+    <% } %>
+  <% } %>
+<% } %>
 
 <% for (var key in options.css) { %>
 import "<%= options.css[key] %>";
 <% } %>
 <% for (var key in options.themeOptions.extensions) { %>
   <% if (options.themeOptions.extensions[key].css) { %>
-     import '<%= options.themeOptions.extensions[key].css %>'
+    import '<%= options.themeOptions.extensions[key].css %>'
 <% } %><% } %>
 const baseURL = document
 ? '<%= options.browserBaseURL %>'
@@ -40,19 +57,19 @@ export default async (ctx, inject) => {
 
         const headers = {}
 
-        // headers['Cookie'] = _.map(
-        //   ctx.app.$cookies.getAll(),
-        //   (value, index) => {
-        //     let resValue = value
-        //     if(typeof value === 'object') {
-        //       resValue = JSON.stringify(resValue)
-        //     }
-        //     if (typeof value === 'array') {
-        //       resValue = JSON.stringify(resValue)
-        //     }
-        //     return index + '=' + resValue
-        //   }
-        // ).join(';')
+        headers['Cookie'] = map(
+          ctx.$cookies.getAll(),
+          (value, index) => {
+            let resValue = value
+            if(typeof value === 'object') {
+              resValue = JSON.stringify(resValue)
+            }
+            if (typeof value === 'array') {
+              resValue = JSON.stringify(resValue)
+            }
+            return index + '=' + resValue
+          }
+        ).join(';')
 
         operation.setContext({
           headers
@@ -82,6 +99,30 @@ export default async (ctx, inject) => {
     <% } %>
     <% } %>
 
+    ctx.app.use(VueLazyLoad, {
+    throttleWait: 10000
+  })
+
+  const images = {}
+
+  <% for (var key in options.images) { %>
+
+  images.<%= key %> = {}<% if (typeof options.images[key].image !== 'undefined' && options.images[key].image !== '') { %>
+  images.<%= key %>.image = <%= options.images[key].image  %>;
+  images.<%= key %>.image = images.<%= key %>.image.default
+  <% } %><% if (typeof options.images[key].width !== 'undefined') { %>
+  images.<%= key %>.width = <%= options.images[key].width  %>;
+  images.<%= key %>.height = <%= options.images[key].height  %>;<% } %><% } %>
+
+  <% for (var key in options.themeOptions.templates) { %>
+    <% if (key.startsWith('Layout')) {%>
+      ctx.app.component('VfT<%= key %>', <%= key %>);
+    <% } %>
+  <% } %>
+  <% for (var key in options.themeOptions.extensions) { %>
+      ctx.app.component('VfE<%= key %>', <%= key %>);
+  <% } %>
+
   const extensions = {}
 
   <% for (var key in options.themeOptions.extensions) { %>
@@ -94,16 +135,12 @@ export default async (ctx, inject) => {
 }<% } %><% } %>
 
 
-  const images = {}
+        
 
-  <% for (var key in options.images) { %>
-
-  images.<%= key %> = {}<% if (typeof options.images[key].image !== 'undefined') { %>
-  images.<%= key %>.image = <%= options.images[key].image  %>;
-  <% } %><% if (typeof options.images[key].width !== 'undefined') { %>
-  images.<%= key %>.width = <%= options.images[key].width  %>;
-  images.<%= key %>.height = <%= options.images[key].height  %>;<% } %><% } %>
-
+  ctx.app.component('ClientOnly', {
+    template: '<slot></slot>'
+  })
+  
   inject('vuefront', {
     layouts: <%= JSON.stringify(options.themeOptions.layouts || {}) %>,
     extensions,
@@ -112,15 +149,15 @@ export default async (ctx, inject) => {
     options: <%= JSON.stringify(options.themeOptions.options) %>,
     baseURL,
     get isAuth() {
-      return ctx.store.getters['common/customer/auth']
+      return ctx.$store.getters['common/customer/auth']
     },
     async logout() {
-      await ctx.store.dispatch('common/customer/logout')
+      await ctx.$store.dispatch('common/customer/logout')
       
-      ctx.app.router.push("/account/login");
+      ctx.$router.push("/account/login");
     },
     get isClient() {
-      return process.client
+      return !!document
     },
     get params() {
       let result = ctx.$route.value.params
@@ -145,7 +182,7 @@ export default async (ctx, inject) => {
       return isMobile
     },
     get isAMP() {
-      return /^\/amp([\/].*)?$/gi.test(ctx.$route.value.fullPath)
+      return /^\/amp([\/].*)?$/gi.test(ctx.$route.fullPath)
     }
   })
 

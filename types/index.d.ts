@@ -1,21 +1,21 @@
-interface VueFrontComponent {
+declare interface VueFrontComponent {
     component?: string
     css?: string
     type?: VueFrontPathType
     path?: string
   }
-  type VueFrontComponentList = {
+   type VueFrontComponentList = {
     [key: string]: VueFrontComponent | string
   }
   
-  type VueFrontConfigRoot = {
+  declare  type VueFrontConfigRoot = {
     components?: string
     store?: string
     locales?: string
   }
+
   
-  
-  type VueFrontComponentKey = 'atoms' | 'molecules' | 'organisms' | 'templates' | 'pages' | 'loaders' | 'extensions'
+  declare  type VueFrontComponentKey = 'atoms' | 'molecules' | 'organisms' | 'templates' | 'pages' | 'loaders' | 'extensions'
 
 //  export const enum VueFrontComponentKey {
 //     atoms = 'atoms',
@@ -27,72 +27,74 @@ interface VueFrontComponent {
 //     extensions = 'extension'
 //   }
   
-  type VueFrontConfigComponents = {
+declare type VueFrontConfigComponents = {
     [key in VueFrontComponentKey]?: VueFrontComponentList;
   }
   
-  type VuefrontStore = {
+  declare type VuefrontStore = {
     path?: string,
     module?: string | VuefrontStoreModule
   }
-  type VuefrontStoreModule = {
+  declare type VuefrontStoreModule = {
     type: VueFrontPathType
     path: string
     component?: string
   }
   
-  type VuefrontLocaleModule = {
+  declare type VuefrontLocaleModule = {
     type: VueFrontPathType
     path: string
     component?: string
   }
   
-  type VuefrontStoreList = {
+  declare type VuefrontStoreList = {
     [key: string]: VuefrontStore
   }
   
-  interface VueFrontConfig extends VueFrontConfigComponents {
+  declare interface VueFrontConfig extends VueFrontConfigComponents {
     root?: VueFrontConfigRoot;
     store?: VuefrontStoreList;
     theme?: string;
     app?: string[];
+    css?: string[];
     locales?: VuefrontLocalesList;
     seo?: VueFrontSeoList;
     image?: VueFrontImageList;
   }
 
-  type VueFrontImage = {
-    path: string
-    width: string
-    height: string
+  declare type VueFrontImage = {
+    path: string 
+    image?: string
+    width?: string
+    height?: string
   }
 
-  type VueFrontImageList = {
+  declare type VueFrontImageList = {
     [key: string]: VueFrontImage
   }
 
-  type VueFrontSeoList = {
+  declare type VueFrontSeoList = {
     [key: string]: VueFrontSeo
   }
 
-  type VueFrontSeoResult = {
+  declare type VueFrontSeoResult = {
     id: string
     url: string
   }
 
-  type VueFrontSeo = {
+  declare type VueFrontSeo = {
     component: string
     generate: boolean
     seo(): VueFrontSeoResult
   }
   
-  type VuefrontLocalesList = {
+  declare type VuefrontLocalesList = {
     [key: string]: Array<string | VuefrontLocaleModule>
   }
 
-  type VueFrontPathType = 'full' | 'inside'
+  declare type VueFrontPathType = 'full' | 'inside'
   
-  type VueFrontConvertComponent = {
+  declare type VueFrontConvertComponent = {
     type: VueFrontPathType
     path: string
     component?: string

@@ -1,3 +1,5 @@
+import { VueQuery } from "../utils"
+
 const renderImport = (component, tag) => {
   let result = ''
 
@@ -62,8 +64,9 @@ const getImport = (name, type, config, tag, renderImport) => {
   return comImport
 }
 
-export default (code, components = [], config: VueFrontConfig) => {
+export default (code, components = [], config: VueFrontConfig, descriptor: {filename: string; query: VueQuery }) => {
   const imports = []
+
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm
 
@@ -94,6 +97,5 @@ export default (code, components = [], config: VueFrontConfig) => {
       code += '\n\n' + newContent
     }
   }
-
   return code;
 };
