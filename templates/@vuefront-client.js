@@ -9,12 +9,10 @@ export default async (app) => {
   app.$router.afterEach(fixPrepatch.bind(app))
 
   app.$router.beforeEach((to, from, next) => {
-    console.log('seoResolver')
     seoResolver.call(app, app, to, from, next)
   })
   app.$router.beforeEach(loadAsyncComponents.bind(app))
   app.$router.beforeEach((to, from, next) => {
-    console.log('dataFetch')
     dataFetch.call(app, app, to, from, next)
   })
 

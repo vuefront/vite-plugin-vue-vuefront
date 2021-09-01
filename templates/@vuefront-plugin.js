@@ -2,6 +2,7 @@ import isEmpty from 'lodash-es/isEmpty'
 import map from 'lodash-es/map'
 import ApolloClient from "apollo-boost";
 import VueLazyLoad from 'vue3-lazyload'
+import {h} from 'vue'
 import 'isomorphic-fetch'
 <% for (var key in options.themeOptions.extensions) { %>
   <% if (options.themeOptions.extensions[key].type === 'full') { %>
@@ -132,13 +133,12 @@ export default async (ctx, inject) => {
   };<% } else { %>
   extensions.<%= key %> = () => {
     return import('<%= options.themeOptions.extensions[key].path %>').then(m => m.<%= options.themeOptions.extensions[key].component %>)
-}<% } %><% } %>
-
-
-        
+}<% } %><% } %> 
 
   ctx.app.component('ClientOnly', {
-    template: '<slot></slot>'
+    render() {
+      return this.$slots.default()
+    }
   })
   
   inject('vuefront', {

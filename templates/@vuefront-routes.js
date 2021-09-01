@@ -1,22 +1,3 @@
-import isUndefined from 'lodash-es/isUndefined'
-const applyAsyncData = (Component, asyncData) => {
-  if (
-    !asyncData
-  ) {
-    return
-  }
-  const ComponentData = Component.data || function () { return {} }
-  Component._originDataFn = ComponentData
-
-  Component.data = function () {
-    const data = ComponentData.call(this, this)
-    return { ...data, ...asyncData }
-  }
-
-  if (Component._Ctor && Component._Ctor.options) {
-    Component._Ctor.data = Component.data
-  }
-}
 const breadcrumbsLoad = (component, context) => {
     component.serverPrefetch = function() {
       return new Promise(async (resolve) => {
@@ -28,21 +9,6 @@ const breadcrumbsLoad = (component, context) => {
         resolve()
       })
     }
-    // component.beforeRouteEnter = async (to, from, next) => {
-    //   if (!isUndefined(component.fetch)) {
-    //       await component.fetch({
-    //       route: to,
-    //       router: context.$router,
-    //       store: context.$store,
-    //       ...context,
-    //     })
-    //   }
-    //   if (component.asyncData) {
-    //     const asyncDataResult = await component.asyncData(context)
-    //     applyAsyncData(component, asyncDataResult)
-    //   }
-    //   next()
-    // }
     component.created = function() {
         if (typeof this.loaded !== 'undefined') {
         if(!this.loaded) {

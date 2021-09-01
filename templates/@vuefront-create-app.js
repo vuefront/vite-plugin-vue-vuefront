@@ -49,6 +49,11 @@ export const createVueFrontApp = async (App) => {
   router = createRouter({
     history: createWebHistory(),
     routes: [...routes, ...getRoutes(context),
+      {
+        name: '_slug',
+        path: '/:slug',
+        component: { template: '<vf-t-common-error></vf-t-common-error>' }
+      }
     ],
     fallback: false
   })
