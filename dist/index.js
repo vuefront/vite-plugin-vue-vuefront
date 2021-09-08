@@ -332,14 +332,12 @@ var convertComponent = (component, config2) => {
   if (config2.pages[component].type === "full") {
     return `import('${config2.pages[component].path}').then((m) => {
       const component = m.default || m
-      breadcrumbsLoad(component, ctx)
       return component
     })`;
   } else {
     return `import('${config2.pages[component].path}').then((m) => {
       let component = m.${config2.pages[component].component}
       component = component.default || component
-      breadcrumbsLoad(component, ctx)
       return component
     })`;
   }

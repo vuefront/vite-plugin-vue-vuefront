@@ -6,14 +6,12 @@ const convertComponent = (component: string, config: VueFrontConfig): string => 
   if ((config.pages[component] as VueFrontComponent).type === 'full') {
     return `import('${(config.pages[component] as VueFrontComponent).path}').then((m) => {
       const component = m.default || m
-      breadcrumbsLoad(component, ctx)
       return component
     })`
   } else {
     return `import('${(config.pages[component] as VueFrontComponent).path}').then((m) => {
       let component = m.${(config.pages[component] as VueFrontComponent).component}
       component = component.default || component
-      breadcrumbsLoad(component, ctx)
       return component
     })`
   }

@@ -2,6 +2,7 @@ import isEmpty from 'lodash-es/isEmpty'
 import map from 'lodash-es/map'
 import ApolloClient from "apollo-boost";
 import VueLazyLoad from 'vue3-lazyload'
+import { createMetaManager, plugin as metaPlugin } from 'vue-meta'
 import {h} from 'vue'
 import 'isomorphic-fetch'
 <% for (var key in options.themeOptions.extensions) { %>
@@ -79,6 +80,8 @@ export default async (ctx, inject) => {
     });
     
   inject('vfapollo', client)
+  const metaManager = createMetaManager()
+  ctx.app.use(metaManager)
   const opts = {}
   // if(process.client) {
     // if(isUndefined(window.__NUXT__)) {
