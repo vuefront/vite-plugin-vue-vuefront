@@ -84,6 +84,7 @@ declare type VueFrontConfigComponents = {
 
   declare type VueFrontSeo = {
     component: string
+    loader: string
     generate: boolean
     seo(): VueFrontSeoResult
   }

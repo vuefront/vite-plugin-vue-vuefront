@@ -1,13 +1,16 @@
-  export const getRoutes = (ctx) => {
+import {defineAsyncComponent} from 'vue'
+export const getRoutes = (ctx) => {
       return [<% for (var i=0; i < options.routes.length; i++){%> {
           name: '<%= options.routes[i].name %>',
           path: '<%= options.routes[i].path %>',
           <% if(typeof options.routes[i].props !== 'undefined') {%>
-          props: <%= JSON.stringify(options.routes[i].props) %>,
+            meta: {
+            <% if(typeof options.routes[i].props.loader !== 'undefined') {%>
+            loader: defineAsyncComponent(<%= options.routes[i].props.loader %>)
+            <% } %>
+            },
           <% } %>
-          component: () => {
-            return <%= options.routes[i].component %>
-          }
+          component: () => <%= options.routes[i].component %>
   
       }, <% } %>]
   }

@@ -330,13 +330,24 @@ var convertComponent = (component, config2) => {
     return "";
   }
   if (config2.pages[component].type === "full") {
-    return `import('${config2.pages[component].path}').then((m) => {
-      const component = m.default || m
-      return component
-    })`;
+    return `import('${config2.pages[component].path}')`;
   } else {
     return `import('${config2.pages[component].path}').then((m) => {
       let component = m.${config2.pages[component].component}
+      component = component.default || component
+      return component
+    })`;
+  }
+};
+var convertLoader = (component, config2) => {
+  if (!config2.loaders) {
+    return "";
+  }
+  if (config2.loaders[component].type === "full") {
+    return `() => import('${config2.loaders[component].path}')`;
+  } else {
+    return `() => import('${config2.loaders[component].path}').then((m) => {
+      let component = m.${config2.loaders[component].component}
       component = component.default || component
       return component
     })`;
@@ -355,9 +366,14 @@ var setupRoutes_default = (config2) => {
     } else {
       exclude = [...exclude, url];
     }
+    const props = {};
+    if (pageComponent.loader) {
+      props.loader = convertLoader(pageComponent.loader, config2);
+    }
     routes.push({
       name: url.replace("/", "_").replace(":", "_"),
       path: url,
+      props,
       component: convertComponent(pageComponent.component, config2)
     });
   }
