@@ -1,3 +1,7 @@
+declare module "@vuefront-create-app" {
+}
+
+
 declare interface VueFrontComponent {
     component?: string
     css?: string

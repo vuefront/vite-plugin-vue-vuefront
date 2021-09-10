@@ -1,6 +1,6 @@
 import { VueQuery } from "../utils"
 
-const renderImport = (component, tag) => {
+const renderImport = (component: VueFrontComponent, tag: string) => {
   let result = ''
 
   if (component.type === 'full') {
@@ -11,7 +11,7 @@ const renderImport = (component, tag) => {
 
   return result
 }
-const renderImportCss = (component, tag) => {
+const renderImportCss = (component: VueFrontComponent, tag: string) => {
   let result = ''
 
   if (component.css) {
@@ -20,57 +20,63 @@ const renderImportCss = (component, tag) => {
 
   return result
 }
-const getImport = (name, type, config, tag, renderImport) => {
-  let comImport = false
+type IRenderFunction = (component: VueFrontComponent, tag: string) => string;
+const getImport = (name: string, type: string, config: VueFrontConfig, tag: string, renderImport: IRenderFunction): boolean | string | void => {
+
+  let comImport: boolean | string | void = false
 
   switch (type) {
     case 'A':
-    if(!config.atoms[name]) {
+    if(!config.atoms || !config.atoms[name]) {
       return
     }
-    comImport = renderImport(config.atoms[name], tag)
+    comImport = renderImport(config.atoms[name] as VueFrontComponent, tag)
     break;
     case 'M':
-    if(!config.molecules[name]) {
+    if(!config.molecules || !config.molecules[name]) {
       return
     }
-    comImport = renderImport(config.molecules[name], tag)
+    comImport = renderImport(config.molecules[name] as VueFrontComponent, tag)
     break;
     case 'O':
-    if(!config.organisms[name]) {
+    if(!config.organisms || !config.organisms[name]) {
       return
     }
-    comImport = renderImport(config.organisms[name], tag)
+    comImport = renderImport(config.organisms[name] as VueFrontComponent, tag)
     break;
     case 'T':
-    if(!config.templates[name]) {
+    if(!config.templates || !config.templates[name]) {
       return
     }
-    comImport = renderImport(config.templates[name], tag)
+    comImport = renderImport(config.templates[name] as VueFrontComponent, tag)
     break;
     case 'L':
-    if(!config.loaders[name]) {
+    if(!config.loaders || !config.loaders[name]) {
       return
     }
-    comImport = renderImport(config.loaders[name], tag)
+    comImport = renderImport(config.loaders[name] as VueFrontComponent, tag)
     break;
     case 'E':
-    if(!config.extensions[name]) {
+    if(!config.extensions || !config.extensions[name]) {
       return
     }
-    comImport = renderImport(config.extensions[name], tag)
+    comImport = renderImport(config.extensions[name] as VueFrontComponent, tag)
     break;
   }
   return comImport
 }
 
-export default (code, components = [], config: VueFrontConfig, descriptor: {filename: string; query: VueQuery }) => {
+export default (code: string, components = [], config: VueFrontConfig, descriptor: {filename: string; query: VueQuery }) => {
   const imports = []
 
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm
 
     const m = regex.exec(tag)
+
+    if (!m) {
+      continue
+    }
   
     const type = m[1]
     const name = m[2]

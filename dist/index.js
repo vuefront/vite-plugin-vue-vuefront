@@ -423,7 +423,7 @@ var readFile2 = (path3) => new Promise((resolve3, reject) => {
     if (err) {
       reject(err);
     } else {
-      resolve3(data);
+      resolve3(data.toString());
     }
   });
 });
@@ -458,7 +458,7 @@ var extract_default = (template2, filename, config2) => {
     compilerOptions: {}
   });
   return {
-    components: getComponents(config2, [...result.ast.components])
+    components: getComponents(config2, result.ast ? [...result.ast.components] : [])
   };
 };
 
@@ -483,37 +483,37 @@ var getImport = (name, type, config2, tag, renderImport2) => {
   let comImport = false;
   switch (type) {
     case "A":
-      if (!config2.atoms[name]) {
+      if (!config2.atoms || !config2.atoms[name]) {
         return;
       }
       comImport = renderImport2(config2.atoms[name], tag);
       break;
     case "M":
-      if (!config2.molecules[name]) {
+      if (!config2.molecules || !config2.molecules[name]) {
         return;
       }
       comImport = renderImport2(config2.molecules[name], tag);
       break;
     case "O":
-      if (!config2.organisms[name]) {
+      if (!config2.organisms || !config2.organisms[name]) {
         return;
       }
       comImport = renderImport2(config2.organisms[name], tag);
       break;
     case "T":
-      if (!config2.templates[name]) {
+      if (!config2.templates || !config2.templates[name]) {
         return;
       }
       comImport = renderImport2(config2.templates[name], tag);
       break;
     case "L":
-      if (!config2.loaders[name]) {
+      if (!config2.loaders || !config2.loaders[name]) {
         return;
       }
       comImport = renderImport2(config2.loaders[name], tag);
       break;
     case "E":
-      if (!config2.extensions[name]) {
+      if (!config2.extensions || !config2.extensions[name]) {
         return;
       }
       comImport = renderImport2(config2.extensions[name], tag);
@@ -526,6 +526,9 @@ var transform_default = (code, components = [], config2, descriptor) => {
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm;
     const m = regex.exec(tag);
+    if (!m) {
+      continue;
+    }
     const type = m[1];
     const name = m[2];
     let comImport = getImport(name, type, config2, tag, renderImport);
@@ -602,7 +605,6 @@ function pluginVueFront(options = {}) {
   if (process.env.API_URL_BROWSER) {
     browserBaseURL = process.env.API_URL_BROWSER;
   }
-  let app = null;
   if (!browserBaseURL) {
     if (options.proxy && prefix) {
       browserBaseURL = prefix;

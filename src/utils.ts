@@ -56,7 +56,7 @@ export function parseVueRequest(id: string): {
  export function requirePeer (name: string) {
    try {
      return require(name)
-   } catch (e) {
+   } catch (e: any) {
      if (e.code !== 'MODULE_NOT_FOUND') throw e
      throw new Error(`Module "${name}" required by "vuefront-loader" not found.`)
    }

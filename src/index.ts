@@ -88,8 +88,6 @@ function pluginVueFront(
     browserBaseURL = process.env.API_URL_BROWSER
   }
 
-  let app = null
-
   if (!browserBaseURL) {
     if (options.proxy && prefix) {
       browserBaseURL = prefix
