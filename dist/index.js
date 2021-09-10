@@ -545,12 +545,17 @@ var transform_default = (code, components = [], config2, descriptor) => {
       newContent += item[1];
       result.push(`${item[0]}`);
     }
-    newContent += `installComponents(_sfc_main, {${result.join(",")}})
-`;
     const hotReload = code.indexOf("function _sfc_render");
+    const exportDefault = code.indexOf("export default /* @__PURE__ */ _defineComponent({");
     if (hotReload > -1) {
+      newContent += `installComponents(_sfc_main, {${result.join(",")}})
+`;
       code = code.slice(0, hotReload) + newContent + "\n\n" + code.slice(hotReload);
+    } else if (exportDefault > -1) {
+      code = code.slice(0, exportDefault) + newContent + "\n\nexport default /* @__PURE__ */ _defineComponent({components:{" + result.join(",") + "}," + code.slice(exportDefault + 49);
     } else {
+      newContent += `installComponents(_sfc_main, {${result.join(",")}})
+`;
       code += "\n\n" + newContent;
     }
   }

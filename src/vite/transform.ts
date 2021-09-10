@@ -1,5 +1,4 @@
 import { VueQuery } from "../utils"
-
 const renderImport = (component: VueFrontComponent, tag: string) => {
   let result = ''
 
@@ -94,14 +93,20 @@ export default (code: string, components = [], config: VueFrontConfig, descripto
       newContent += item[1];
       result.push(`${item[0]}`)
     }
-    newContent += `installComponents(_sfc_main, {${result.join(',')}})\n`
+
     // Insert our modification before the HMR code
     const hotReload = code.indexOf('function _sfc_render')
+    const exportDefault = code.indexOf('export default /* @__PURE__ */ _defineComponent({')
     if (hotReload > -1) {
+      newContent += `installComponents(_sfc_main, {${result.join(',')}})\n`
       code = code.slice(0, hotReload) + newContent + '\n\n' + code.slice(hotReload)
+    } else if(exportDefault > -1) {
+      code = code.slice(0, exportDefault) + newContent + '\n\n' + 'export default /* @__PURE__ */ _defineComponent({components:{'+result.join(',') + "}," + code.slice(exportDefault+49)
     } else {
+      newContent += `installComponents(_sfc_main, {${result.join(',')}})\n`
       code += '\n\n' + newContent
     }
   }
+
   return code;
 };
