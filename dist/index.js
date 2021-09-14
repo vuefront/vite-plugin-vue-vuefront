@@ -306,7 +306,8 @@ var setupConfig_default = (rootDir) => {
   if (typeof config2.app !== "undefined") {
     for (const key in config2.app) {
       delete require.cache[require.resolve(config2.app[key])];
-      const customAppConfig = require(config2.app[key]).default;
+      let customAppConfig = require(config2.app[key]);
+      customAppConfig = customAppConfig.default || customAppConfig;
       let customAppOptions = cloneConfig(customAppConfig);
       customAppOptions = __spreadValues(__spreadValues({}, customAppOptions), convertPath(customAppOptions));
       themeOptions = _.mergeWith(themeOptions, customAppOptions, mergeConfig);

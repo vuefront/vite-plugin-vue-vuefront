@@ -214,8 +214,8 @@ export default (rootDir: string): VueFrontConfig => {
   if (typeof config.app !== 'undefined') {
     for(const key in config.app) {
       delete require.cache[require.resolve(config.app[key])]
-      const customAppConfig = require(config.app[key]).default
-      
+      let customAppConfig = require(config.app[key])
+      customAppConfig = customAppConfig.default || customAppConfig
       let customAppOptions = cloneConfig(customAppConfig)
       customAppOptions = {...customAppOptions, ...convertPath(customAppOptions)}
       themeOptions = _.mergeWith(themeOptions, customAppOptions, mergeConfig)

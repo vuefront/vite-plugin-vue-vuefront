@@ -33,5 +33,13 @@
     "eslint:recommended",
     "plugin:import/recommended",
     "plugin:import/typescript"
-  ]
+  ],
+  "overrides": [
+    {
+        "files": ["*.ts"],
+        "rules": {
+            "no-undef": "off"
+        }
+    }
+]
 }
