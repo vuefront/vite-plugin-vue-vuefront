@@ -546,6 +546,7 @@ var transform_default = (code, components = [], config2, descriptor) => {
       newContent += item[1];
       result.push(`${item[0]}`);
     }
+    const sfcMain = code.indexOf("_sfc_main");
     const hotReload = code.indexOf("function _sfc_render");
     const exportDefault = code.indexOf("export default /* @__PURE__ */ _defineComponent({");
     if (hotReload > -1) {
@@ -554,7 +555,7 @@ var transform_default = (code, components = [], config2, descriptor) => {
       code = code.slice(0, hotReload) + newContent + "\n\n" + code.slice(hotReload);
     } else if (exportDefault > -1) {
       code = code.slice(0, exportDefault) + newContent + "\n\nexport default /* @__PURE__ */ _defineComponent({components:{" + result.join(",") + "}," + code.slice(exportDefault + 49);
-    } else {
+    } else if (sfcMain > -1) {
       newContent += `installComponents(_sfc_main, {${result.join(",")}})
 `;
       code += "\n\n" + newContent;
@@ -581,12 +582,9 @@ function pluginVueFront(options = {}) {
   const vuefrontCreateApp = "@vuefront-create-app";
   const vuefrontPlugins = [
     "@vuefront-client",
-    "@vuefront-utils",
-    "@vuefront-lazy-components",
+    "@vuefront-cookie",
     "@vuefront-seo-resolver",
-    "@vuefront-data-fetch",
-    "@vuefront-i18n",
-    "@vuefront-fix-prepatch"
+    "@vuefront-i18n"
   ];
   const css = [];
   const themeOptions = setupConfig_default(process.cwd());

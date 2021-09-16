@@ -34,12 +34,9 @@ function pluginVueFront(
   const vuefrontCreateApp = '@vuefront-create-app'
   const vuefrontPlugins = [
     '@vuefront-client',
-    '@vuefront-utils',
-    '@vuefront-lazy-components',
+    '@vuefront-cookie',
     '@vuefront-seo-resolver',
-    '@vuefront-data-fetch',
     '@vuefront-i18n',
-    '@vuefront-fix-prepatch'
   ]
 
   const css: string[] = []

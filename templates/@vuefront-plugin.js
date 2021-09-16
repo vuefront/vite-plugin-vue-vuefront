@@ -1,34 +1,26 @@
-import isEmpty from 'lodash-es/isEmpty'
-import map from 'lodash-es/map'
+import {isEmpty, map} from 'lodash'
 import ApolloClient from "apollo-boost";
 import VueLazyLoad from 'vue3-lazyload'
-import { createMetaManager, plugin as metaPlugin } from 'vue-meta'
-import {h} from 'vue'
+import { createMetaManager } from 'vue-meta'
 import 'isomorphic-fetch'
-<% for (var key in options.themeOptions.extensions) { %>
-  <% if (options.themeOptions.extensions[key].type === 'full') { %>
-     import <%= key %> from '<%= options.themeOptions.extensions[key].path %>'
-  <% } else { %>
-    import {<%= options.themeOptions.extensions[key].component %> as <%= key %>} from '<%= options.themeOptions.extensions[key].path %>'
+<% for (var key in options.css) { %>import "<%= options.css[key] %>";<% } %>
+<% for (var key in options.themeOptions.extensions) { %><% if (options.themeOptions.extensions[key].css) { %>
+import '<%= options.themeOptions.extensions[key].css %>'<% } %><% } %>
+<% for (var key in options.themeOptions.extensions) { %><% if (options.themeOptions.extensions[key].type === 'full') { %>
+import <%= key %> from '<%= options.themeOptions.extensions[key].path %>'<% } else { %>
+import {<%= options.themeOptions.extensions[key].component %> as <%= key %>} from '<%= options.themeOptions.extensions[key].path %>'
 <% } %><% } %>
-<% for (var key in options.themeOptions.templates) { %>
-  <% if (key.startsWith('Layout')) {%>
-    <% if (options.themeOptions.templates[key].type === 'full') { %>
-      import <%= key %> from '<%= options.themeOptions.templates[key].path %>'
-    <% } else { %>
-      import {<%= options.themeOptions.templates[key].component %> as <%= key %>} from '<%= options.themeOptions.templates[key].path %>'
-    <% } %>
-  <% } %>
-<% } %>
+<% for (var key in options.themeOptions.templates) { %><% if (key.startsWith('Layout')) {%><% if (options.themeOptions.templates[key].type === 'full') { %>
+import <%= key %> from '<%= options.themeOptions.templates[key].path %>'<% } else { %>
+import {<%= options.themeOptions.templates[key].component %> as <%= key %>} from '<%= options.themeOptions.templates[key].path %>'
+    <% } %><% } %><% } %>
 
-<% for (var key in options.css) { %>
-import "<%= options.css[key] %>";
-<% } %>
+
 <% for (var key in options.themeOptions.extensions) { %>
-  <% if (options.themeOptions.extensions[key].css) { %>
+<% if (options.themeOptions.extensions[key].css) { %>
     import '<%= options.themeOptions.extensions[key].css %>'
 <% } %><% } %>
-const baseURL = document
+const baseURL = typeof document !== "undefined"
 ? '<%= options.browserBaseURL %>'
 : '<%= options.baseURL %>'
 
@@ -80,7 +72,9 @@ export default async (ctx, inject) => {
     });
     
   inject('vfapollo', client)
-  const metaManager = createMetaManager()
+  const metaManager = createMetaManager({
+    isSSR: typeof document === "undefined"
+  })
   ctx.app.use(metaManager)
   const opts = {}
   // if(process.client) {
@@ -160,7 +154,7 @@ export default async (ctx, inject) => {
       ctx.$router.push("/account/login");
     },
     get isClient() {
-      return !!document
+      return typeof document !== "undefined"
     },
     get params() {
       let result = ctx.$route.value.params

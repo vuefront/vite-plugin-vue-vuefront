@@ -1,9 +1,9 @@
 import {createApp} from 'vue'
 import {createStore} from 'vuex'
-import {createRouter, createWebHistory} from 'vue-router'
+import {createRouter, createWebHistory, createMemoryHistory} from 'vue-router'
 import routes from 'voie-pages';
-import Cookie from 'cookie-universal'
-import isUndefined from 'lodash/isUndefined'
+import Cookie from '@vuefront-cookie'
+import {isUndefined} from 'lodash'
 
 import {getRoutes} from '@vuefront-routes'
 import VuefrontI18n from '@vuefront-i18n'
@@ -47,7 +47,7 @@ export const createVueFrontApp = async (App) => {
   })
   context.app = vuefrontApp
   router = createRouter({
-    history: createWebHistory(),
+    history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
     routes: [...routes, ...getRoutes(context),
       {
         name: '_slug',
@@ -71,7 +71,6 @@ export const createVueFrontApp = async (App) => {
 
   context.$store = store
   context.store = store
-
   const cookies = Cookie()
   inject('cookies', cookies)
 
@@ -81,13 +80,15 @@ export const createVueFrontApp = async (App) => {
   // store.app =  injectVars
   store.app.i18n = i18n
 
-  if(!document) {
+  if(typeof document === "undefined") {
     await store.dispatch('vuefront/nuxtServerInit', app)
-  } else if(document) {
+  } else if(typeof document !== "undefined") {
     await store.dispatch('vuefront/nuxtClientInit', app)
   }
   await VuefrontClient(context)
   
-  window.__VEUFRONT__ = context
-  return vuefrontApp
+  if (typeof window !== 'undefined') {
+    window.__VUEFRONT__ = context
+  }
+  return {app: vuefrontApp, router}
 }

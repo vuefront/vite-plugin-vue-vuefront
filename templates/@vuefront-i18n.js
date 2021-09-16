@@ -1,6 +1,5 @@
 import {createI18n} from 'vue-i18n'
-import merge from 'lodash-es/merge'
-import isUndefined from 'lodash-es/isUndefined'
+import {merge, isUndefined} from 'lodash'
 
 
 async function loadLocaleMessages(options) {

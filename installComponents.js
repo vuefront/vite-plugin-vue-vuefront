@@ -2,7 +2,7 @@
 // This module is a runtime utility for cleaner component module output and will
 // be included in the final webpack user bundle.
 
-export default (component, components) => {
+module.exports = function installComponents (component, components) {
   component.components = component.components || {}
 
   for (var i in components) {
