@@ -10,7 +10,7 @@ import VuefrontApollo from '@vuefront-apollo';
 import VuefrontClient from '@vuefront-client'
 import VuefrontStore from '@vuefront-store'
 import VuefrontPlugin from "@vuefront-plugin";
-
+import VfTCommonError from '<%= options.themeOptions.templates.CommonError.path %>'
 export const createVueFrontApp = async (App) => {
   process.client = true
   const app = {
@@ -53,7 +53,7 @@ export const createVueFrontApp = async (App) => {
       {
         name: '_slug',
         path: '/:slug',
-        component: { template: '<vf-t-common-error></vf-t-common-error>' }
+        component: VfTCommonError
       }
     ],
     fallback: false
@@ -79,7 +79,6 @@ export const createVueFrontApp = async (App) => {
   await VuefrontPlugin(context, inject)
   i18n = await VuefrontI18n(context, inject)
   inject('i18n', i18n)
-  // store.app =  injectVars
   store.app.i18n = i18n
 
   if(typeof document === "undefined") {
