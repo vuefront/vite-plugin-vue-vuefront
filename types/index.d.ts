@@ -36,13 +36,14 @@ declare type VueFrontConfigComponents = {
   }
   
   declare type VuefrontStore = {
-    path?: string,
+    path: string | string[],
     module?: string | VuefrontStoreModule
   }
   declare type VuefrontStoreModule = {
     type: VueFrontPathType
     path: string
     component?: string
+    name?: string
   }
   
   declare type VuefrontLocaleModule = {

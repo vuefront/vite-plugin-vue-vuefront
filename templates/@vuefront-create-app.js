@@ -1,5 +1,4 @@
 import {createApp} from 'vue'
-import {createStore} from 'vuex'
 import {createRouter, createWebHistory, createMemoryHistory} from 'vue-router'
 import routes from 'voie-pages';
 import Cookie from '@vuefront-cookie'
@@ -7,8 +6,10 @@ import {isUndefined} from 'lodash'
 
 import {getRoutes} from '@vuefront-routes'
 import VuefrontI18n from '@vuefront-i18n'
-import VuefrontPlugin from "@vuefront-plugin";
+import VuefrontApollo from '@vuefront-apollo';
 import VuefrontClient from '@vuefront-client'
+import VuefrontStore from '@vuefront-store'
+import VuefrontPlugin from "@vuefront-plugin";
 
 export const createVueFrontApp = async (App) => {
   process.client = true
@@ -64,13 +65,14 @@ export const createVueFrontApp = async (App) => {
     return router.currentRoute
   }}
 
-  store = createStore()
+  store = VuefrontStore(context, inject)
   store.app = context.app
   context.app.use(store)
   store.$router = router
 
   context.$store = store
   context.store = store
+  await VuefrontApollo(context, inject)
   const cookies = Cookie()
   inject('cookies', cookies)
 

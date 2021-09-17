@@ -218,33 +218,30 @@ var convertPath = (config2) => {
   if (config2.store) {
     result.store = {};
     for (const key in config2.store) {
-      let storeResult = {};
+      let storeResult = config2.store[key];
+      if (_.isArray(storeResult.path)) {
+        storeResult.path = storeResult.path.join("|modules|").split("|");
+      }
       if (!config2.store[key].module) {
         storeResult = config2.store[key];
       } else {
         if (typeof config2.store[key].module === "string") {
           if (checkPath(config2.store[key].module)) {
-            storeResult = __spreadProps(__spreadValues({}, config2.store[key]), {
-              module: {
-                type: "full",
-                path: config2.store[key].module
-              }
-            });
+            storeResult.module = {
+              type: "full",
+              path: config2.store[key].module
+            };
           } else if (checkPath(((_h = config2 == null ? void 0 : config2.root) == null ? void 0 : _h.store) + "/" + config2.store[key].module)) {
-            storeResult = __spreadProps(__spreadValues({}, config2.store[key]), {
-              module: {
-                type: "full",
-                path: ((_i = config2 == null ? void 0 : config2.root) == null ? void 0 : _i.store) + "/" + config2.store[key].module
-              }
-            });
+            storeResult.module = {
+              type: "full",
+              path: ((_i = config2 == null ? void 0 : config2.root) == null ? void 0 : _i.store) + "/" + config2.store[key].module
+            };
           } else {
-            storeResult = __spreadProps(__spreadValues({}, config2.store[key]), {
-              module: {
-                type: "inside",
-                path: ((_j = config2 == null ? void 0 : config2.root) == null ? void 0 : _j.store) || "",
-                component: config2.store[key].module
-              }
-            });
+            storeResult.module = {
+              type: "inside",
+              path: ((_j = config2 == null ? void 0 : config2.root) == null ? void 0 : _j.store) || "",
+              component: config2.store[key].module
+            };
           }
         }
       }
@@ -252,7 +249,7 @@ var convertPath = (config2) => {
       if (_.isArray(storeResult.path)) {
         storeKey = storeResult.path.map((val) => _.capitalize(val)).join("");
       }
-      if (storeResult == null ? void 0 : storeResult.path) {
+      if (_.isString(storeResult == null ? void 0 : storeResult.path)) {
         storeKey = storeResult.path;
       }
       if (result.store) {
@@ -584,7 +581,9 @@ function pluginVueFront(options = {}) {
     "@vuefront-client",
     "@vuefront-cookie",
     "@vuefront-seo-resolver",
-    "@vuefront-i18n"
+    "@vuefront-i18n",
+    "@vuefront-store",
+    "@vuefront-apollo"
   ];
   const css = [];
   const themeOptions = setupConfig_default(process.cwd());
@@ -618,6 +617,31 @@ function pluginVueFront(options = {}) {
   }
   return {
     name: "vite-plugin-vue-vuefront",
+    config(config2, env) {
+      if (!config2.optimizeDeps) {
+        config2.optimizeDeps = {};
+      }
+      if (!config2.optimizeDeps.include) {
+        config2.optimizeDeps.include = [];
+      }
+      if (!config2.optimizeDeps.exclude) {
+        config2.optimizeDeps.exclude = [];
+      }
+      config2.optimizeDeps.include = [
+        ...config2.optimizeDeps.include,
+        "omit-deep-lodash",
+        "apollo-boost",
+        "isomorphic-fetch",
+        "vue-meta/ssr",
+        "cookie",
+        "vite-plugin-vue-vuefront/installComponents"
+      ];
+      config2.optimizeDeps.exclude = [
+        ...config2.optimizeDeps.exclude,
+        "vue-demi"
+      ];
+      return config2;
+    },
     async transform(src, id) {
       if (/vue&type=graphql/.test(id)) {
         src = src.replace("export default doc", "");
@@ -663,6 +687,8 @@ function pluginVueFront(options = {}) {
         let compiled = _4.template(routesContent.toString());
         return compiled({
           options: {
+            browserBaseURL,
+            baseURL,
             themeOptions
           }
         });
