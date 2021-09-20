@@ -1,6 +1,6 @@
 {
     "name": "vite-plugin-vue-vuefront",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "vite-plugin-vue-vuefront",
     "main": "dist/index.js",
     "types": "types/index.d.ts",
