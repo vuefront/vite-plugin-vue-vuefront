@@ -653,7 +653,7 @@ function pluginVueFront(options = {}) {
       const descriptor = parseVueRequest(id);
       if (externalScriptTemplate.has(id)) {
         return extractAndTransform(src, externalScriptTemplate.get(id), descriptor, themeOptions);
-      } else if (/.*\.vue/.test(id)) {
+      } else if (/.*\.vue[^a-zA-Z]?/.test(id)) {
         const source = await load(id);
         if (source.isExternalScript) {
           externalScriptTemplate.set(source.scriptPath, source.template);
