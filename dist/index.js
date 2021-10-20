@@ -312,7 +312,8 @@ var setupConfig_default = (rootDir) => {
   }
   if (typeof config2.theme !== "undefined") {
     delete require.cache[require.resolve(config2.theme)];
-    const customThemeConfig = require(config2.theme).default;
+    let customThemeConfig = require(config2.theme);
+    customThemeConfig = customThemeConfig.default || customThemeConfig;
     let customThemeOptions = cloneConfig(customThemeConfig);
     customThemeOptions = __spreadValues(__spreadValues({}, customThemeOptions), convertPath(customThemeOptions));
     themeOptions = _.mergeWith(themeOptions, customThemeOptions, mergeConfig);

@@ -218,7 +218,8 @@ export default (rootDir: string): VueFrontConfig => {
 
   if (typeof config.theme !== 'undefined') {
     delete require.cache[require.resolve(config.theme)]
-    const customThemeConfig = require(config.theme).default
+    let customThemeConfig = require(config.theme)
+    customThemeConfig = customThemeConfig.default || customThemeConfig
     let customThemeOptions = cloneConfig(customThemeConfig)
     customThemeOptions = {...customThemeOptions, ...convertPath(customThemeOptions)}
     themeOptions = _.mergeWith(themeOptions, customThemeOptions, mergeConfig)
