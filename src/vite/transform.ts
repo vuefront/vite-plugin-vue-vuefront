@@ -1,22 +1,4 @@
 import { VueQuery } from "../utils"
-
-export function camelCase(str: string) {
-  return str.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''))
-}
-
-export function kebabCase(key: string) {
-  const result = key.replace(/([A-Z])/g, ' $1').trim()
-  return result.split(' ').join('-').toLowerCase()
-}
-
-export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-export function pascalCase(str: string) {
-  return capitalize(camelCase(str))
-}
-
 const renderImport = (component: VueFrontComponent, tag: string) => {
   let result = ''
 
@@ -50,9 +32,7 @@ const getImport = (name: string, type: string, config: VueFrontConfig, tag: stri
     if(!config.atoms || !config.atoms[name]) {
       return
     }
-    
     comImport = renderImport(config.atoms[name] as VueFrontComponent, tag)
-
     break;
     case 'M':
     if(!config.molecules || !config.molecules[name]) {
@@ -90,6 +70,7 @@ const getImport = (name: string, type: string, config: VueFrontConfig, tag: stri
 
 export default (code: string, components = [], config: VueFrontConfig, descriptor: {filename: string; query: VueQuery }) => {
   const imports = []
+
   for (const tag of components) {
     const regex = /^Vf(.)(.*)$/gm
 
@@ -98,7 +79,7 @@ export default (code: string, components = [], config: VueFrontConfig, descripto
     if (!m) {
       continue
     }
-
+  
     const type = m[1]
     const name = m[2]
     let comImport = getImport(name, type, config, tag, renderImport)
@@ -114,19 +95,17 @@ export default (code: string, components = [], config: VueFrontConfig, descripto
       newContent += item[1];
       result.push(`${item[0]}`)
     }
-    newContent += `\n\nif (typeof component !== "undefined") {
-      \n installComponents(component, {${result.join(',')}})\n
-    }\n
-    if (typeof __component__ !== "undefined") {
-      \n installComponents(__component__, {${result.join(',')}})\n
-    }\n
-    `
     // Insert our modification before the HMR code
-    const hotReload = code.indexOf('/* hot reload */')
-
+    const sfcMain = code.indexOf('_sfc_main')
+    const hotReload = code.indexOf('function _sfc_render')
+    const exportDefault = code.indexOf('export default /* @__PURE__ */ _defineComponent({')
     if (hotReload > -1) {
+      newContent += `installComponents(_sfc_main, {${result.join(',')}})\n`
       code = code.slice(0, hotReload) + newContent + '\n\n' + code.slice(hotReload)
-    } else {
+    } else if(exportDefault > -1) {
+      code = code.slice(0, exportDefault) + newContent + '\n\n' + 'export default /* @__PURE__ */ _defineComponent({components:{'+result.join(',') + "}," + code.slice(exportDefault+49)
+    } else if(sfcMain > -1) {
+      newContent += `installComponents(_sfc_main, {${result.join(',')}})\n`
       code += '\n\n' + newContent
     }
   }

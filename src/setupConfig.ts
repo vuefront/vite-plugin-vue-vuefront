@@ -117,35 +117,29 @@ const convertPath = (config: VueFrontConfig): VueFrontConfig => {
   if(config.store) {
     result.store = {}
     for (const key in config.store) {
-      let storeResult: VuefrontStore = {}
+      let storeResult: VuefrontStore = config.store[key]
+      if (_.isArray(storeResult.path)) {
+        storeResult.path = storeResult.path.join('|modules|').split('|')
+      }
       if(!config.store[key].module) {
         storeResult = config.store[key]
       } else {
         if (typeof config.store[key].module === 'string' ) {
           if(checkPath(config.store[key].module as string)) {
-            storeResult = {
-                ...config.store[key],
-                module: {
-                  type: 'full',
-                  path: config.store[key].module as string
-                }
-              }
+            storeResult.module = {              
+              type: 'full',
+              path: config.store[key].module as string
+            }
           } else if (checkPath(config?.root?.store + '/' + config.store[key].module)) {
-            storeResult = {
-                ...config.store[key],
-                module: {
-                  type: 'full',
-                  path: config?.root?.store + '/' + config.store[key].module
-                }
-              }
+            storeResult.module = {
+              type: 'full',
+              path: config?.root?.store + '/' + config.store[key].module
+            }
           } else {
-            storeResult = {
-              ...config.store[key],
-              module: {
-                type: 'inside',
-                path: config?.root?.store || '',
-                component: config.store[key].module as string
-              }
+            storeResult.module = {
+              type: 'inside',
+              path: config?.root?.store || '',
+              component: config.store[key].module as string
             }
           }
         }
@@ -155,7 +149,7 @@ const convertPath = (config: VueFrontConfig): VueFrontConfig => {
       if (_.isArray(storeResult.path)) {
         storeKey = storeResult.path.map(val => (_.capitalize(val))).join('')
       }
-      if (storeResult?.path) {
+      if (_.isString(storeResult?.path)) {
         storeKey = storeResult.path
       }
       if (result.store) {
@@ -203,7 +197,6 @@ const cloneConfig = (config: VueFrontConfig): VueFrontConfig => {
 
 export default (rootDir: string): VueFrontConfig => {
   let themeOptions: VueFrontConfig = {}
-
   themeOptions = cloneConfig(vuefrontDefaultConfig)
   rootPath = rootDir
 
@@ -215,8 +208,8 @@ export default (rootDir: string): VueFrontConfig => {
   if (typeof config.app !== 'undefined') {
     for(const key in config.app) {
       delete require.cache[require.resolve(config.app[key])]
-      const customAppConfig = require(config.app[key]).default
-      
+      let customAppConfig = require(config.app[key])
+      customAppConfig = customAppConfig.default || customAppConfig
       let customAppOptions = cloneConfig(customAppConfig)
       customAppOptions = {...customAppOptions, ...convertPath(customAppOptions)}
       themeOptions = _.mergeWith(themeOptions, customAppOptions, mergeConfig)
@@ -225,7 +218,8 @@ export default (rootDir: string): VueFrontConfig => {
 
   if (typeof config.theme !== 'undefined') {
     delete require.cache[require.resolve(config.theme)]
-    const customThemeConfig = require(config.theme).default
+    let customThemeConfig = require(config.theme)
+    customThemeConfig = customThemeConfig.default || customThemeConfig
     let customThemeOptions = cloneConfig(customThemeConfig)
     customThemeOptions = {...customThemeOptions, ...convertPath(customThemeOptions)}
     themeOptions = _.mergeWith(themeOptions, customThemeOptions, mergeConfig)

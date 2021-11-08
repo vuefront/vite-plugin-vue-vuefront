@@ -1,19 +1,16 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import VueRouter from 'vue-router'
+import {createApp} from 'vue'
+import {createRouter, createWebHistory, createMemoryHistory} from 'vue-router'
 import routes from 'voie-pages';
-import Cookie from 'cookie-universal'
-import isUndefined from 'lodash/isUndefined'
+import Cookie from '@vuefront-cookie'
+import {isUndefined} from 'lodash'
 
 import {getRoutes} from '@vuefront-routes'
 import VuefrontI18n from '@vuefront-i18n'
-import VuefrontPlugin from "@vuefront-plugin";
+import VuefrontApollo from '@vuefront-apollo';
 import VuefrontClient from '@vuefront-client'
-
-
-Vue.use(VueRouter)
-Vue.use(Vuex)
-
+import VuefrontStore from '@vuefront-store'
+import VuefrontPlugin from "@vuefront-plugin";
+import VfTCommonError from '<%= options.themeOptions.templates.CommonError.path %>'
 export const createVueFrontApp = async (App) => {
   process.client = true
   const app = {
@@ -23,10 +20,8 @@ export const createVueFrontApp = async (App) => {
   let vuefrontApp = null
 
   let injectVars = {}
-  const store = new Vuex.Store()
 
-  context.$store = store
-  context.store = store
+  let store = null
 
   const inject = (key, value) => {
     if (isUndefined(app[key])) {
@@ -35,56 +30,66 @@ export const createVueFrontApp = async (App) => {
       app[key] = value
       store[key] = value
       injectVars[key] = value
-      Vue.use(() => {
-        if (!Vue.prototype.hasOwnProperty(key)) {
-          Object.defineProperty(Vue.prototype, key, {
-            get() {
-              return this.$root.$options[key]
-            }
-          })
-        }
-      })
+      context.app.config.globalProperties[key] = value
+      context.app.provide(key, value)
     }
   }
   context.router = null
 
-  const router = new VueRouter({
-    mode: "history",
-    routes: [...routes, ...getRoutes(context),
-    ],
-    fallback: false
-  })
-  context.$router = router
-  context = {...context,  get $route() {
-    return router.currentRoute
-  }}
-  store.$router = router
-
-
-  const cookies = Cookie()
-  inject('cookies', cookies)
-
-
-  await VuefrontPlugin(context, inject)
-  const i18n = await VuefrontI18n(context, inject)
-  inject(i18n, inject)
-  store.app = injectVars
-  store.app.i18n = i18n
+  let i18n = null
+  let router = null
   
-  vuefrontApp = new Vue({
+  vuefrontApp = createApp({
     i18n,
     store,
     router,
     ...app,
     ...injectVars,
   })
-  if(!document) {
+  context.app = vuefrontApp
+  router = createRouter({
+    history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
+    routes: [...routes, ...getRoutes(context),
+      {
+        name: '_slug',
+        path: '/:slug',
+        component: VfTCommonError
+      }
+    ],
+    fallback: false
+  })
+  
+  context.$router = router
+  context.app.use(router)
+  context = {...context,  get $route() {
+    return router.currentRoute
+  }}
+
+  store = VuefrontStore(context, inject)
+  store.app = context.app
+  context.app.use(store)
+  store.$router = router
+
+  context.$store = store
+  context.store = store
+  await VuefrontApollo(context, inject)
+  const cookies = Cookie()
+  inject('cookies', cookies)
+
+  await VuefrontPlugin(context, inject)
+  i18n = await VuefrontI18n(context, inject)
+  inject('i18n', i18n)
+  store.app.i18n = i18n
+
+  if(typeof document === "undefined") {
     await store.dispatch('vuefront/nuxtServerInit', app)
-  } else if(document) {
+  } else if(typeof document !== "undefined") {
     await store.dispatch('vuefront/nuxtClientInit', app)
   }
   await VuefrontClient(context)
   
-  window.__VEUFRONT__ = context
-  return vuefrontApp
+  if (typeof window !== 'undefined') {
+    window.__VUEFRONT__ = context
+  }
+  return {app: vuefrontApp, router}
 }

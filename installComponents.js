@@ -2,16 +2,8 @@
 // This module is a runtime utility for cleaner component module output and will
 // be included in the final webpack user bundle.
 
-export default (component, components) => {
-  var options = typeof component.exports === 'function'
-    ? component.exports.extendOptions
-    : component.options
-
-  if (typeof component.exports === 'function') {
-    options.components = component.exports.options.components
-  }
-
-  options.components = options.components || {}
+module.exports = function installComponents (component, components) {
+  component.components = component.components || {}
 
   for (var i in components) {
     options.components[i] = options.components[i] || components[i]

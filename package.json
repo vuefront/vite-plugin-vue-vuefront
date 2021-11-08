@@ -1,18 +1,19 @@
 {
     "name": "vite-plugin-vue-vuefront",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "description": "vite-plugin-vue-vuefront",
     "main": "dist/index.js",
     "types": "types/index.d.ts",
     "files": [
         "dist/**/*",
         "templates/**/*",
+        "client.d.ts",
         "installComponents.js"
     ],
     "scripts": {
         "dev": "tsc -p . -w --incremental",
         "build": "rimraf dist && run-s build-bundle build-types",
-        "build-bundle": "nodemon -e ts -x esbuild src/index.ts --bundle --platform=node --target=node12 --external:vue-template-compiler --outfile=dist/index.js",
+        "build-bundle": "nodemon -e ts -x esbuild src/index.ts --bundle --platform=node --target=node12 --external:@vue/compiler-sfc --external:vuefront --external:lodash --external:dotenv --outfile=dist/index.js",
         "build-types": "tsc -p . --emitDeclarationOnly --outDir temp && api-extractor run && rimraf temp",
         "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s --commit-path . --lerna-package plugin-vue",
         "yalc-watch": "nodemon -e vue,js,scss,json -x yalc push"
@@ -26,42 +27,32 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@types/estree": "0.0.50",
-        "@types/node": "^16.6.1",
-        "@types/stylelint": "^13.13.1",
-        "@typescript-eslint/eslint-plugin": "^4.29.2",
-        "@typescript-eslint/parser": "^4.29.2",
-        "eslint": "^7.32.0",
-        "eslint-import-resolver-typescript": "^2.4.0",
-        "eslint-plugin-import": "^2.24.0",
-        "nodemon": "^2.0.12",
-        "npm-run-all": "^4.1.5",
-        "typescript": "^4.3.5",
-        "vite": "^2.5.0",
-        "vuefront": "^0.3.78"
+        "@types/dotenv": "^8.2.0",
+        "@types/lodash": "^4.14.176",
+        "@types/node": "^16.11.4",
+        "@types/stylelint": "^13.13.3",
+        "@typescript-eslint/eslint-plugin": "^5.1.0",
+        "@typescript-eslint/parser": "^5.1.0",
+        "eslint": "^8.1.0",
+        "eslint-import-resolver-typescript": "^2.5.0",
+        "eslint-plugin-import": "^2.25.2",
+        "nodemon": "^2.0.14",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.4.4",
+        "vite": "^2.6.11",
+        "vuefront": "^0.5.0"
     },
     "dependencies": {
-        "@rollup/pluginutils": "^4.1.1",
-        "@types/dotenv": "^8.2.0",
-        "@types/lodash": "^4.14.172",
-        "@vue/compiler-sfc": "^3.2.4",
+        "@vue/compiler-sfc": "^3.2.20",
         "apollo-boost": "^0.4.9",
-        "assign-deep": "^1.0.1",
-        "cookie-universal": "^2.1.5",
+        "cookie": "^0.4.1",
         "dotenv": "^10.0.0",
         "isomorphic-fetch": "^3.0.0",
-        "jscodeshift": "^0.13.0",
         "lodash": "^4.17.21",
         "lodash-es": "^4.17.21",
         "querystring": "^0.2.1",
-        "rimraf": "^3.0.2",
-        "vue-i18n": "8.25.0",
-        "vue-router": "^3.5.2",
-        "vue-template-compiler": "^2.6.14"
-    },
-    "y": {
-        "rollup": "^2.38.5",
-        "vite": "^2.5.0",
-        "vuefront": "^0.3.78"
+        "vue-i18n": "^9.2.0-beta.15",
+        "vue-meta": "^3.0.0-alpha.9",
+        "vue3-lazyload": "^0.2.2-beta"
     }
 }

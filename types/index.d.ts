@@ -1,3 +1,7 @@
+declare module "@vuefront-create-app" {
+}
+
+
 declare interface VueFrontComponent {
     component?: string
     css?: string
@@ -32,13 +36,14 @@ declare type VueFrontConfigComponents = {
   }
   
   declare type VuefrontStore = {
-    path?: string,
+    path: string | string[],
     module?: string | VuefrontStoreModule
   }
   declare type VuefrontStoreModule = {
     type: VueFrontPathType
     path: string
     component?: string
+    name?: string
   }
   
   declare type VuefrontLocaleModule = {
@@ -84,6 +89,7 @@ declare type VueFrontConfigComponents = {
 
   declare type VueFrontSeo = {
     component: string
+    loader: string
     generate: boolean
     seo(): VueFrontSeoResult
   }

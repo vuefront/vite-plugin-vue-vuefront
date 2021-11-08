@@ -1,88 +1,30 @@
-import Vue from 'vue'
-import isEmpty from 'lodash-es/isEmpty'
-import map from 'lodash-es/map'
-import ApolloClient from "apollo-boost";
-import 'isomorphic-fetch'
-
+import {isEmpty} from 'lodash'
+import VueLazyLoad from 'vue3-lazyload'
+import { createMetaManager } from 'vue-meta'
 <% for (var key in options.css) { %>
-import "<%= options.css[key] %>";
-<% } %>
-<% for (var key in options.themeOptions.extensions) { %>
-  <% if (options.themeOptions.extensions[key].css) { %>
-    import '<%= options.themeOptions.extensions[key].css %>'
+import "<%= options.css[key] %>";<% } %>
+<% for (var key in options.themeOptions.extensions) { %><% if (options.themeOptions.extensions[key].css) { %>
+import '<%= options.themeOptions.extensions[key].css %>';
 <% } %><% } %>
-const baseURL = document
-? '<%= options.browserBaseURL %>'
-: '<%= options.baseURL %>'
+<% for (var key in options.themeOptions.extensions) { %><% if (options.themeOptions.extensions[key].type === 'full') { %>
+import <%= key %> from '<%= options.themeOptions.extensions[key].path %>'<% } else { %>
+import {<%= options.themeOptions.extensions[key].component %> as <%= key %>} from '<%= options.themeOptions.extensions[key].path %>'
+<% } %><% } %>
+<% for (var key in options.themeOptions.templates) { %><% if (key.startsWith('Layout')) {%><% if (options.themeOptions.templates[key].type === 'full') { %>
+import <%= key %> from '<%= options.themeOptions.templates[key].path %>'<% } else { %>
+import {<%= options.themeOptions.templates[key].component %> as <%= key %>} from '<%= options.themeOptions.templates[key].path %>'<% } %><% } %><% } %>
+<% for (var key in options.themeOptions.extensions) { %><% if (options.themeOptions.extensions[key].css) { %>
+import '<%= options.themeOptions.extensions[key].css %>'<% } %><% } %>
+
 
 export default async (ctx, inject) => {
-  const client = new ApolloClient({
-    uri: baseURL,
-      headers: {
-        accept: 'application/json; charset=UTF-8',
-        'content-type': 'application/json; charset=UTF-8'
-      },
-      onError: (error) => {
-        console.log(JSON.stringify(error));
-        if (error.graphQLErrors) {
-          console.log('ApolloClient graphQLErrors')
-          console.log(error)
-        }
-        if (error.networkError) {
-          console.log('ApolloClient networkError')
-          console.log(error)
-        }
-      },
-      request: (operation) => {
-        operation.setContext({
-          fetchOptions: {
-            credentials: 'include'
-          }
-        });
-
-        const headers = {}
-
-        headers['Cookie'] = map(
-          ctx.$cookies.getAll(),
-          (value, index) => {
-            let resValue = value
-            if(typeof value === 'object') {
-              resValue = JSON.stringify(resValue)
-            }
-            if (typeof value === 'array') {
-              resValue = JSON.stringify(resValue)
-            }
-            return index + '=' + resValue
-          }
-        ).join(';')
-
-        operation.setContext({
-          headers
-        });
-      }
-    });
-    
-  inject('vfapollo', client)
-  const opts = {}
-  // if(process.client) {
-    // if(isUndefined(window.__NUXT__)) {
-      // opts.preserveState = false
-    // } else if(!isUndefined(window.__NUXT__) && isUndefined(window.__NUXT__.serverRendered)) {
-      // opts.preserveState = false
-    // }
-  // }
-  
-  <% for (var key in options.themeOptions.store) { %>
-    <% if (typeof options.themeOptions.store[key].module !== 'undefined') {%>
-    <% if (options.themeOptions.store[key].module.type === 'full') { %>
-    ctx.$store.registerModule(<%= JSON.stringify(options.themeOptions.store[key].path) %>, {namespaced: true, ...(await import('<%= options.themeOptions.store[key].module.path %>'))}, opts)
-    <% } else { %>
-    ctx.$store.registerModule(<%= JSON.stringify(options.themeOptions.store[key].path) %>, {namespaced: true, ...(await import('<%= options.themeOptions.store[key].module.path %>'))['<%= options.themeOptions.store[key].module.component %>']}, opts)
-    <% } %>
-    <% } else { %>
-      ctx.$store.registerModule(<%= JSON.stringify(options.themeOptions.store[key].path) %>, {namespaced: true}, opts)
-    <% } %>
-    <% } %>
+  const metaManager = createMetaManager({
+    isSSR: typeof document === "undefined"
+  })
+  ctx.app.use(metaManager)
+  ctx.app.use(VueLazyLoad, {
+    throttleWait: 10000
+  })
 
   const images = {}
 
@@ -95,31 +37,21 @@ export default async (ctx, inject) => {
   images.<%= key %>.width = <%= options.images[key].width  %>;
   images.<%= key %>.height = <%= options.images[key].height  %>;<% } %><% } %>
 
+  <% for (var key in options.themeOptions.templates) { %><% if (key.startsWith('Layout')) {%>
+  ctx.app.component('VfT<%= key %>', <%= key %>);<% } %><% } %>
+  <% for (var key in options.themeOptions.extensions) { %>
+  ctx.app.component('VfE<%= key %>', <%= key %>);<% } %>
+
   const extensions = {}
-  const templates = {}
 
   <% for (var key in options.themeOptions.extensions) { %>
-
-    <% if (options.themeOptions.extensions[key].type === 'full') { %>
-      extensions.<%= key %> = () => {
-        return import('<%= options.themeOptions.extensions[key].path %>')
-      };<% } else { %>
-      extensions.<%= key %> = () => {
-        return import('<%= options.themeOptions.extensions[key].path %>').then(m => m.<%= options.themeOptions.extensions[key].component %>)
-      }<% } %><% } %>
-<% for (var key in options.themeOptions.templates) { %>
-  <% if (key.startsWith('Layout')) {%>
-    <% if (options.themeOptions.templates[key].type === 'full') { %>
-        templates.<%= key %> = () => {
-          return import('<%= options.themeOptions.templates[key].path %>')
-        };<% } else { %>
-        templates.<%= key %> = () => {
-          return import('<%= options.themeOptions.templates[key].path %>').then(m => m.<%= options.themeOptions.templates[key].component %>)
-        }<% } %><% } %><% } %>
-
-  Vue.component('ClientOnly', {
-    template: '<slot></slot>'
-  })
+  <% if (options.themeOptions.extensions[key].type === 'full') { %>
+  extensions.<%= key %> = () => { 
+    return import('<%= options.themeOptions.extensions[key].path %>')
+  };<% } else { %>
+  extensions.<%= key %> = () => {
+    return import('<%= options.themeOptions.extensions[key].path %>').then(m => m.<%= options.themeOptions.extensions[key].component %>)
+}<% } %><% } %> 
   
   inject('vuefront', {
     layouts: <%= JSON.stringify(options.themeOptions.layouts || {}) %>,
@@ -127,7 +59,6 @@ export default async (ctx, inject) => {
     templates,
     images,
     options: <%= JSON.stringify(options.themeOptions.options) %>,
-    baseURL,
     get isAuth() {
       return ctx.$store.getters['common/customer/auth']
     },
@@ -137,7 +68,7 @@ export default async (ctx, inject) => {
       ctx.$router.push("/account/login");
     },
     get isClient() {
-      return !!document
+      return typeof document !== "undefined"
     },
     get params() {
       let result = ctx.$route.params

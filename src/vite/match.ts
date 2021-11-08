@@ -7,8 +7,8 @@ const normalize = (items: string[]): NormalizeComponent[] =>
     camel: capitalize(camelize(item)),
   }));
 
-const getComponents = (config: VueFrontConfig, tags: string[]) => {
-  return normalize(tags)
+  const getComponents = (config: VueFrontConfig, tags: string[]) => {
+    return normalize(tags)
     .filter(
       ({ kebab, camel }) => 
         kebab.startsWith('vf-'),

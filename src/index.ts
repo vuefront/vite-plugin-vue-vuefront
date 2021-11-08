@@ -31,15 +31,14 @@ function pluginVueFront(
   
   const vuefrontRoutesId = '@vuefront-routes'
   const vuefrontPluginId = '@vuefront-plugin'
+  const vuefrontCreateApp = '@vuefront-create-app'
   const vuefrontPlugins = [
-    '@vuefront-create-app',
     '@vuefront-client',
-    '@vuefront-utils',
-    '@vuefront-lazy-components',
+    '@vuefront-cookie',
     '@vuefront-seo-resolver',
-    '@vuefront-data-fetch',
     '@vuefront-i18n',
-    '@vuefront-fix-prepatch'
+    "@vuefront-store",
+    "@vuefront-apollo"
   ]
 
   const css: string[] = []
@@ -98,6 +97,34 @@ function pluginVueFront(
 
   return {
     name: 'vite-plugin-vue-vuefront',
+    config(config, env) {
+      if (!config.optimizeDeps) {
+        config.optimizeDeps = {}
+      }
+
+      if (!config.optimizeDeps.include) {
+        config.optimizeDeps.include = []
+      }
+      if (!config.optimizeDeps.exclude) {
+        config.optimizeDeps.exclude = []
+      }
+      config.optimizeDeps.include = [
+        ...config.optimizeDeps.include,
+        "omit-deep-lodash",
+        "apollo-boost",
+        "isomorphic-fetch",
+        "vue-meta/ssr",
+        "cookie",
+        "vite-plugin-vue-vuefront/installComponents",
+      ]
+
+      config.optimizeDeps.exclude = [
+        ...config.optimizeDeps.exclude,
+        "vue-demi"
+      ]
+
+      return config
+    },
     async transform(src, id) {
       if (/vue&type=graphql/.test(id)) {
         src = src.replace('export default doc', '')
@@ -114,9 +141,10 @@ function pluginVueFront(
         }`
       }
       const descriptor = parseVueRequest(id)
+
       if (externalScriptTemplate.has(id)) {
         return extractAndTransform(src, externalScriptTemplate.get(id), descriptor, themeOptions);
-      } else if (/.*\.vue/.test(id)) {
+      } else if (/.*\.vue([?].*)?$/.test(id)) {
         const source = await load(id);
 
         if (source.isExternalScript) {
@@ -135,6 +163,9 @@ function pluginVueFront(
       if (_.includes(vuefrontPlugins,id)) {
         return id
       }
+      if (id === vuefrontCreateApp) {
+        return vuefrontCreateApp
+      }
       if (id === vuefrontRoutesId) {
         return vuefrontRoutesId
       }
@@ -149,9 +180,16 @@ function pluginVueFront(
 
         return compiled({
           options: {
+            browserBaseURL,
+            baseURL,
             themeOptions
           }
         })
+      }
+      if (id === vuefrontCreateApp) {
+        const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-create-app.js'));
+        let compiled = _.template(routesContent.toString())
+        return compiled({ options: { themeOptions } })
       }
       if (id === vuefrontRoutesId) {
         const routesContent = fs.readFileSync(path.resolve(__dirname, '../templates/@vuefront-routes.js'));

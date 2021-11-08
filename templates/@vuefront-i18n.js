@@ -1,10 +1,6 @@
-import Vue from 'vue'
-import VueI18n from 'vue-i18n'
-import merge from 'lodash-es/merge'
-import isUndefined from 'lodash-es/isUndefined'
+import {createI18n} from 'vue-i18n'
+import {merge, isUndefined} from 'lodash'
 
-
-Vue.use(VueI18n)
 
 async function loadLocaleMessages(options) {
   const messages = {}
@@ -34,8 +30,11 @@ async function loadLocaleMessages(options) {
 export default async (ctx, inject) => {
   const messages = await loadLocaleMessages()
 
-  return new VueI18n({
+  const i18n =  createI18n({
     locale: ctx.$store.getters['common/language/locale'],
     messages
   })
+  ctx.app.use(i18n)
+
+  return i18n
 }
