@@ -56,7 +56,7 @@ export default async (ctx, inject) => {
   inject('vuefront', {
     layouts: <%= JSON.stringify(options.themeOptions.layouts || {}) %>,
     extensions,
-    templates,
+    templates: {},
     images,
     options: <%= JSON.stringify(options.themeOptions.options) %>,
     get isAuth() {
@@ -71,10 +71,10 @@ export default async (ctx, inject) => {
       return typeof document !== "undefined"
     },
     get params() {
-      let result = ctx.$route.params
+      let result = ctx.$route.value.params
 
-      if(!isEmpty(ctx.$route.matched)) {
-        result = {...result, ...ctx.$route.matched[0].props.default}
+      if(!isEmpty(ctx.$route.value.matched)) {
+        result = {...result, ...ctx.$route.value.matched[0].props.default}
       }
 
       return result

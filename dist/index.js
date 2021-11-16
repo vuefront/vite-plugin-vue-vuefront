@@ -414,7 +414,7 @@ var fs2 = __toModule(require("fs"));
 var _4 = __toModule(require("lodash"));
 
 // src/vite/load.ts
-var import_vue_template_compiler = __toModule(require("vue-template-compiler"));
+var import_compiler_sfc = __toModule(require("@vue/compiler-sfc"));
 var fs = __toModule(require("fs"));
 var path = __toModule(require("path"));
 var readFile2 = (path3) => new Promise((resolve3, reject) => {
@@ -429,17 +429,17 @@ var readFile2 = (path3) => new Promise((resolve3, reject) => {
 var load = async (id) => {
   const filename = id.replace(/\?.*/, "");
   const content = (await readFile2(filename)).toString();
-  const component = (0, import_vue_template_compiler.parseComponent)(content);
-  const script = component.script && component.script.content;
+  const component = (0, import_compiler_sfc.parse)(content);
+  const script = component.descriptor.script && component.descriptor.script.content;
   let template2, isExternalScript, scriptPath;
-  if (component.template) {
-    if (component.template.src) {
-      template2 = (await readFile2(path.resolve(path.dirname(filename), component.template.src))).toString();
+  if (component.descriptor.template) {
+    if (component.descriptor.template.src) {
+      template2 = (await readFile2(path.resolve(path.dirname(filename), component.descriptor.template.src))).toString();
     } else {
-      template2 = component.template.content;
+      template2 = component.descriptor.template.content;
     }
-    if (component.script && component.script.src) {
-      scriptPath = path.resolve(path.dirname(filename), component.script.src);
+    if (component.descriptor.script && component.descriptor.script.src) {
+      scriptPath = path.resolve(path.dirname(filename), component.descriptor.script.src);
       isExternalScript = true;
     }
   }
@@ -447,7 +447,7 @@ var load = async (id) => {
 };
 
 // src/vite/extract.ts
-var import_vue_template_compiler2 = __toModule(require("vue-template-compiler"));
+var import_compiler_sfc2 = __toModule(require("@vue/compiler-sfc"));
 var { getComponents } = require_match();
 var extract_default = (template2, filename, config2) => {
   const result = (0, import_compiler_sfc2.compileTemplate)({
@@ -568,8 +568,18 @@ var transform_default = (code, components = [], config2, descriptor) => {
 // src/index.ts
 var import_dotenv = __toModule(require("dotenv"));
 init_utils();
+var import_micromatch = __toModule(require("micromatch"));
+var import_chalk = __toModule(require("chalk"));
 (0, import_dotenv.config)();
 var externalScriptTemplate = new Map();
+function touch(path3) {
+  const time = new Date();
+  try {
+    fs2.utimesSync(path3, time, time);
+  } catch (err) {
+    fs2.closeSync(fs2.openSync(path3, "w"));
+  }
+}
 var extractAndTransform = (code, template2 = "", descriptor, config2) => {
   if (typeof template2 !== "string" || !template2.trim()) {
     return code;
@@ -619,9 +629,55 @@ function pluginVueFront(options = {}) {
       browserBaseURL = baseURL;
     }
   }
+  const pathPlatform = process.platform === "win32" ? path2.win32 : path2.posix;
+  let timerState = "reload";
+  let timer;
+  function clear() {
+    clearTimeout(timer);
+  }
+  function schedule(fn) {
+    clear();
+    timer = setTimeout(fn, 500);
+  }
   return {
     name: "vite-plugin-vue-vuefront",
+    configureServer(server) {
+      let filesToRestart = [
+        "vuefront.config.js",
+        "node_modules/vuefront/index.js",
+        "node_modules/@vuefront/checkout-app/index.js"
+      ];
+      let filesToReload = [
+        "node_modules/vuefront/assets/**",
+        "node_modules/vuefront/tailwind/**",
+        "node_modules/vuefront/lib/**",
+        "node_modules/@vuefront/checkout-app/lib/**"
+      ];
+      filesToReload = filesToReload.map((file) => path2.resolve(process.cwd(), file));
+      filesToRestart = filesToRestart.map((file) => path2.resolve(process.cwd(), file));
+      server.watcher.add([...filesToRestart, ...filesToReload]);
+      server.watcher.on("change", (file) => {
+        if (import_micromatch.default.isMatch(file, filesToRestart)) {
+          timerState = "restart";
+          schedule(() => {
+            touch("vite.config.ts");
+            console.log((0, import_chalk.dim)(new Date().toLocaleTimeString()) + import_chalk.bold.blue` [plugin-restart] ` + import_chalk.yellow`restarting server by ${pathPlatform.relative(process.cwd(), file)}`);
+            timerState = "";
+          });
+        }
+      });
+    },
     config(config2, env) {
+      if (!config2.server)
+        config2.server = {};
+      if (!config2.server.watch)
+        config2.server.watch = {};
+      config2.server.watch.disableGlobbing = false;
+      if (!config2.server.watch.ignored) {
+        config2.server.watch.ignored = [];
+        config2.server.watch.ignored.push("!**/node_modules/vuefront/**");
+        config2.server.watch.ignored.push("!**/node_modules/@vuefront/checkout-app/**");
+      }
       if (!config2.optimizeDeps) {
         config2.optimizeDeps = {};
       }
@@ -649,16 +705,9 @@ function pluginVueFront(options = {}) {
     async transform(src, id) {
       if (/vue&type=graphql/.test(id)) {
         src = src.replace("export default doc", "");
-        return `export default component => {
+        return `export default Comp => {
           ${src}
-          var options = typeof component.exports === 'function'
-          ? component.exports.extendOptions
-          : component.options
-          if (typeof component.exports === 'function') {
-            options.query = doc
-          }
-          
-          options.query = doc
+          Comp.query = doc
         }`;
       }
       const descriptor = parseVueRequest(id);

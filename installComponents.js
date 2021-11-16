@@ -6,6 +6,6 @@ module.exports = function installComponents (component, components) {
   component.components = component.components || {}
 
   for (var i in components) {
-    options.components[i] = options.components[i] || components[i]
+    component.components[i] = component.components[i] || components[i]
   }
 }

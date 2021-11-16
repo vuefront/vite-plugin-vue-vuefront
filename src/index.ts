@@ -11,9 +11,22 @@ import extract from './vite/extract'
 import transform from './vite/transform'
 import { config } from "dotenv";
 import { parseVueRequest, VueQuery } from './utils'
+import micromatch from 'micromatch'
+import { bold, dim, yellow } from 'chalk'
 export * from './options'
 config()
 const externalScriptTemplate = new Map();
+
+function touch(path: string) {
+  const time = new Date()
+
+  try {
+    fs.utimesSync(path, time, time)
+  }
+  catch (err) {
+    fs.closeSync(fs.openSync(path, 'w'))
+  }
+}
 
 const extractAndTransform = (code: string, template = "", descriptor: {filename: string; query: VueQuery }, config: VueFrontConfig) => {
   if (typeof template !== "string" || !template.trim()) {
@@ -95,9 +108,69 @@ function pluginVueFront(
     }
   }
 
+  const pathPlatform = process.platform === 'win32' ? path.win32 : path.posix
+
+  let timerState = 'reload'
+
+  let timer: number | undefined
+
+  function clear() {
+    clearTimeout(timer)
+  }
+  function schedule(fn: () => void) {
+    clear()
+    timer = setTimeout(fn, 500) as any as number
+  }
+
   return {
     name: 'vite-plugin-vue-vuefront',
+    configureServer(server) {
+      let filesToRestart = [
+        'vuefront.config.js',
+        'node_modules/vuefront/index.js',
+        'node_modules/@vuefront/checkout-app/index.js',
+      ]
+
+      let filesToReload = [
+        'node_modules/vuefront/assets/**',
+        'node_modules/vuefront/tailwind/**',
+        'node_modules/vuefront/lib/**',
+        'node_modules/@vuefront/checkout-app/lib/**'
+      ]
+      filesToReload = filesToReload.map(file => path.resolve(process.cwd(), file))
+      filesToRestart = filesToRestart.map(file => path.resolve(process.cwd(), file))
+
+      server.watcher.add([...filesToRestart, ...filesToReload])
+
+      server.watcher.on(
+        'change',
+        (file) => {
+          if (micromatch.isMatch(file, filesToRestart)) {
+            timerState = 'restart'
+            schedule(() => {
+              touch('vite.config.ts')
+              console.log(
+                dim(new Date().toLocaleTimeString())
+                + bold.blue` [plugin-restart] `
+                + yellow`restarting server by ${pathPlatform.relative(process.cwd(), file)}`,
+              )
+              timerState = ''
+            })
+          }
+        },
+      )
+    },
     config(config, env) {
+      if (!config.server)
+      config.server = {}
+      if (!config.server.watch)
+      config.server.watch = {}
+      config.server.watch.disableGlobbing = false
+      if (!config.server.watch.ignored) {
+        config.server.watch.ignored = []
+        config.server.watch.ignored.push('!**/node_modules/vuefront/**')
+        config.server.watch.ignored.push('!**/node_modules/@vuefront/checkout-app/**')
+      }
       if (!config.optimizeDeps) {
         config.optimizeDeps = {}
       }
@@ -128,16 +201,9 @@ function pluginVueFront(
     async transform(src, id) {
       if (/vue&type=graphql/.test(id)) {
         src = src.replace('export default doc', '')
-        return `export default component => {
+        return `export default Comp => {
           ${src}
-          var options = typeof component.exports === 'function'
-          ? component.exports.extendOptions
-          : component.options
-          if (typeof component.exports === 'function') {
-            options.query = doc
-          }
-          
-          options.query = doc
+          Comp.query = doc
         }`
       }
       const descriptor = parseVueRequest(id)

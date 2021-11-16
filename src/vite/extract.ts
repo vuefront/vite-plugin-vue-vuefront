@@ -1,4 +1,4 @@
-import { ASTElement, compile } from "vue-template-compiler";
+import {compileTemplate} from '@vue/compiler-sfc'
 const { getComponents } = require("./match");
 
 export default (template: string, filename: string, config: VueFrontConfig) => {

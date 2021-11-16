@@ -1,4 +1,4 @@
-import { parseComponent } from "vue-template-compiler";
+import {parse} from '@vue/compiler-sfc'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -17,24 +17,24 @@ export const load = async (id: string) => {
   const filename = id.replace(/\?.*/, "");
   const content = (await readFile(filename)).toString();
 
-  const component = parseComponent(content);
-  const script = component.script && component.script.content;
+  const component = parse(content);
+  const script = component.descriptor.script && component.descriptor.script.content;
 
   let template, isExternalScript, scriptPath;
 
-  if (component.template) {
-    if (component.template.src) {
+  if (component.descriptor.template) {
+    if (component.descriptor.template.src) {
       template = (
         await readFile(
-          path.resolve(path.dirname(filename), component.template.src),
+          path.resolve(path.dirname(filename), component.descriptor.template.src),
         )
       ).toString();
     } else {
-      template = component.template.content;
+      template = component.descriptor.template.content;
     }
 
-    if (component.script && component.script.src) {
-      scriptPath = path.resolve(path.dirname(filename), component.script.src);
+    if (component.descriptor.script && component.descriptor.script.src) {
+      scriptPath = path.resolve(path.dirname(filename), component.descriptor.script.src);
       isExternalScript = true;
     }
   }

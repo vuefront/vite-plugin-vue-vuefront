@@ -25,6 +25,7 @@ const renderImportCss = (component: VueFrontComponent, tag: string) => {
 }
 type IRenderFunction = (component: VueFrontComponent, tag: string) => string;
 const getImport = (name: string, type: string, config: VueFrontConfig, tag: string, renderImport: IRenderFunction): boolean | string | void => {
+
   let comImport: boolean | string | void = false
 
   switch (type) {
@@ -86,6 +87,7 @@ export default (code: string, components = [], config: VueFrontConfig, descripto
     let comImportCss = getImport(name, type, config, tag, renderImportCss)
     imports.push([tag, comImport, comImportCss])
   }
+
   if (imports.length) {
     let newContent = '/* vuefront-loader */\n'
     newContent += `import installComponents from "vite-plugin-vue-vuefront/installComponents"\n`
