@@ -16,6 +16,9 @@ import {<%= options.themeOptions.templates[key].component %> as <%= key %>} from
 <% for (var key in options.themeOptions.extensions) { %><% if (options.themeOptions.extensions[key].css) { %>
 import '<%= options.themeOptions.extensions[key].css %>'<% } %><% } %>
 
+const baseURL = typeof document !== "undefined"
+? '<%= options.browserBaseURL %>'
+: '<%= options.baseURL %>'
 
 export default async (ctx, inject) => {
   const metaManager = createMetaManager({
@@ -57,6 +60,7 @@ export default async (ctx, inject) => {
     layouts: <%= JSON.stringify(options.themeOptions.layouts || {}) %>,
     extensions,
     templates: {},
+    baseURL,
     images,
     options: <%= JSON.stringify(options.themeOptions.options) %>,
     get isAuth() {
