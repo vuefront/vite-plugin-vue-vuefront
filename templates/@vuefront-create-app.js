@@ -52,7 +52,7 @@ export const createVueFrontApp = async (App) => {
     routes: [...routes, ...getRoutes(context),
       {
         name: '_slug',
-        path: '/:slug',
+        path: '/:slug/:slug2?/:slug3?',
         component: VfTCommonError
       }
     ],
