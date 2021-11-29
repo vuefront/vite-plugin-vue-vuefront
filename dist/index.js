@@ -700,6 +700,21 @@ function pluginVueFront(options = {}) {
         ...config2.optimizeDeps.exclude,
         "vue-demi"
       ];
+      if (!config2.build) {
+        config2.build = {};
+      }
+      if (!config2.build.rollupOptions) {
+        config2.build.rollupOptions = {};
+      }
+      if (!config2.build.rollupOptions.output) {
+        config2.build.rollupOptions.output = {};
+      }
+      config2.build.rollupOptions.output.inlineDynamicImports = false;
+      config2.build.rollupOptions.output.manualChunks = (id) => {
+        if (id.includes("node_modules/vuefront") || id.includes("node_modules/@vuefront")) {
+          return "vuefront";
+        }
+      };
       return config2;
     },
     async transform(src, id) {

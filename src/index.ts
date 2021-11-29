@@ -196,6 +196,26 @@ function pluginVueFront(
         "vue-demi"
       ]
 
+      if (!config.build) {
+        config.build = {}
+      }
+      if (!config.build.rollupOptions) {
+        config.build.rollupOptions = {}
+      }
+      if (!config.build.rollupOptions.output) {
+        config.build.rollupOptions.output = {}
+      }
+
+      (config.build.rollupOptions.output as any).inlineDynamicImports = false;
+      (config.build.rollupOptions.output as any).manualChunks = (id: string) =>  {
+        if (
+          id.includes("node_modules/vuefront") ||
+          id.includes("node_modules/@vuefront")
+        ) {
+          return "vuefront";
+        }
+      }
+
       return config
     },
     async transform(src, id) {
