@@ -661,7 +661,7 @@ function pluginVueFront(options = {}) {
           timerState = "restart";
           schedule(() => {
             touch("vite.config.ts");
-            console.log((0, import_chalk.dim)(new Date().toLocaleTimeString()) + import_chalk.bold.blue` [plugin-restart] ` + import_chalk.yellow`restarting server by ${pathPlatform.relative(process.cwd(), file)}`);
+            console.log(import_chalk.default.dim(new Date().toLocaleTimeString()) + import_chalk.default.bold.blue` [plugin-restart] ` + import_chalk.default.yellow`restarting server by ${pathPlatform.relative(process.cwd(), file)}`);
             timerState = "";
           });
         }

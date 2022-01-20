@@ -12,7 +12,7 @@ import transform from './vite/transform'
 import { config } from "dotenv";
 import { parseVueRequest, VueQuery } from './utils'
 import micromatch from 'micromatch'
-import { bold, dim, yellow } from 'chalk'
+import chalk from 'chalk'
 export * from './options'
 config()
 const externalScriptTemplate = new Map();
@@ -150,9 +150,9 @@ function pluginVueFront(
             schedule(() => {
               touch('vite.config.ts')
               console.log(
-                dim(new Date().toLocaleTimeString())
-                + bold.blue` [plugin-restart] `
-                + yellow`restarting server by ${pathPlatform.relative(process.cwd(), file)}`,
+                chalk.dim(new Date().toLocaleTimeString())
+                + chalk.bold.blue` [plugin-restart] `
+                + chalk.yellow`restarting server by ${pathPlatform.relative(process.cwd(), file)}`,
               )
               timerState = ''
             })
