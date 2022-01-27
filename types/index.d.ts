@@ -65,6 +65,7 @@ declare type VueFrontConfigComponents = {
     locales?: VuefrontLocalesList;
     seo?: VueFrontSeoList;
     image?: VueFrontImageList;
+    images?: VueFrontImageList;
   }
 
   declare type VueFrontImage = {

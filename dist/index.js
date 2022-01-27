@@ -387,8 +387,15 @@ var setupRoutes_default = (config2) => {
 var _3 = __toModule(require("lodash"));
 var setupImages_default = (config2) => {
   let result = {};
-  for (const key in config2.image) {
-    const image = config2.image[key];
+  let images = {};
+  if (config2.images) {
+    images = _3.merge(images, config2.images);
+  }
+  if (config2.image) {
+    images = _3.merge(images, config2.image);
+  }
+  for (const key in images) {
+    const image = images[key];
     result[key] = {
       image: "",
       path: ""

@@ -1,9 +1,17 @@
 import * as _ from 'lodash'
+
 export default (config: VueFrontConfig) => {
   let result: VueFrontImageList = {}
+  let images: VueFrontImageList = {}
+  if (config.images) {
+    images = _.merge(images, config.images)
+  }
+  if (config.image) {
+    images = _.merge(images, config.image)
+  }
 
-  for (const key in config.image) {
-    const image = config.image[key]
+  for (const key in images) {
+    const image = images[key]
     result[key] = {
       image: '',
       path: ''
