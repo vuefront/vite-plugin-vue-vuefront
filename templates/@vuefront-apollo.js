@@ -32,6 +32,12 @@ export default (ctx, inject) => {
 
         const headers = {}
 
+        if (
+          ctx.$store.getters['common/customer/token']
+        ) {
+          headers['Authorization'] = 'Bearer ' + ctx.$store.getters['common/customer/token']
+        }
+
         headers['Cookie'] = map(
           ctx.$cookies.getAll(),
           (value, index) => {
