@@ -62,6 +62,7 @@ export default async (ctx, inject) => {
     templates: {},
     baseURL,
     images,
+    version: <%= JSON.stringify(options.themeOptions.version) %>,
     options: <%= JSON.stringify(options.themeOptions.options) %>,
     get isAuth() {
       return ctx.$store.getters['common/customer/auth']
